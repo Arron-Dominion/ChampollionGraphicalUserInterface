@@ -30,6 +30,8 @@ WizardStyle=modern
 
 [Dirs]
 Name: "{app}\UserData"; Permissions: users-modify
+Name: "{app}\ChampollionGraphicalUserInterfaceOutput"; Permissions: users-modify
+Name: "{app}\ChampollionGraphicalUserInterfaceAssembly"; Permissions: users-modify
 
 [Files]
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs

@@ -1,5 +1,6 @@
 using ChampollionGraphicalUserInterface.Application.DTO.Input;
 using ChampollionGraphicalUserInterface.Application.Execution;
+using ChampollionGraphicalUserInterface.Application.Paths;
 using ChampollionGraphicalUserInterface.Application.Search;
 using ChampollionGraphicalUserInterface.Application.Settings;
 using ChampollionGraphicalUserInterface.Application.Validation;
@@ -81,19 +82,30 @@ public sealed class MainViewModelTests
     }
 
     [Fact]
-    public void Edition_and_game_changes_clear_transient_paths()
+    public void Startup_populates_application_output_directories()
+    {
+        string applicationDirectory = Path.Combine(Path.GetTempPath(), $"ChampollionApp-{Guid.NewGuid():N}");
+
+        MainViewModel viewModel = CreateViewModel(applicationDirectory);
+
+        Assert.Equal(ApplicationOutputPaths.GetSourceDirectory(applicationDirectory), viewModel.SourceOutputPath);
+        Assert.Equal(ApplicationOutputPaths.GetAssemblyDirectory(applicationDirectory), viewModel.AssemblyOutputPath);
+    }
+
+    [Fact]
+    public void Edition_and_game_changes_reset_transient_paths()
     {
         MainViewModel viewModel = CreateViewModel();
         SetTransientPaths(viewModel);
 
         viewModel.SelectedGame = SupportedGame.Starfield;
 
-        AssertTransientPathsCleared(viewModel);
+        AssertTransientPathsReset(viewModel);
         SetTransientPaths(viewModel);
 
         viewModel.SelectedEdition = ChampollionEdition.Legacy;
 
-        AssertTransientPathsCleared(viewModel);
+        AssertTransientPathsReset(viewModel);
     }
 
     [Fact]
@@ -106,25 +118,18 @@ public sealed class MainViewModelTests
     }
 
     [Fact]
-    public void Resolves_default_output_beside_input_file()
+    public void Resolves_default_output_beside_champollion_executable()
     {
         MainViewModel viewModel = CreateViewModel();
+        string executableDirectory = Path.Combine(Path.GetTempPath(), "Champollion");
+        viewModel.ExecutablePath = Path.Combine(executableDirectory, "Champollion.exe");
         viewModel.InputPath = Path.Combine(Path.GetTempPath(), "script.pex");
 
-        Assert.Equal(Path.GetTempPath().TrimEnd(Path.DirectorySeparatorChar), viewModel.ResolveOutputDirectory(string.Empty));
+        Assert.Equal(Path.GetFullPath(executableDirectory), viewModel.ResolveOutputDirectory(string.Empty));
     }
 
     [Fact]
-    public void Resolves_default_output_to_input_directory()
-    {
-        MainViewModel viewModel = CreateViewModel();
-        viewModel.InputPath = Path.GetTempPath();
-
-        Assert.Equal(Path.GetFullPath(Path.GetTempPath()), viewModel.ResolveOutputDirectory(string.Empty));
-    }
-
-    [Fact]
-    public void Does_not_resolve_output_without_configured_path_or_input()
+    public void Does_not_resolve_output_without_configured_path_or_executable()
     {
         MainViewModel viewModel = CreateViewModel();
 
@@ -138,20 +143,21 @@ public sealed class MainViewModelTests
         viewModel.AssemblyOutputPath = @"C:\Output\Assembly";
     }
 
-    private static void AssertTransientPathsCleared(MainViewModel viewModel)
+    private static void AssertTransientPathsReset(MainViewModel viewModel)
     {
         Assert.Empty(viewModel.InputPath);
-        Assert.Empty(viewModel.SourceOutputPath);
-        Assert.Empty(viewModel.AssemblyOutputPath);
+        Assert.Equal(ApplicationOutputPaths.GetSourceDirectory(), viewModel.SourceOutputPath);
+        Assert.Equal(ApplicationOutputPaths.GetAssemblyDirectory(), viewModel.AssemblyOutputPath);
     }
 
-    private static MainViewModel CreateViewModel()
+    private static MainViewModel CreateViewModel(string? applicationDirectory = null)
     {
         LocalPathValidator pathValidator = new();
         return new MainViewModel(
             pathValidator,
             new ChampollionRunner(pathValidator, new DiagnosticLogWriter()),
             new ExecutableSearchService(pathValidator),
-            new AppSettingsStore());
+            new AppSettingsStore(applicationDirectory),
+            applicationDirectory);
     }
 }

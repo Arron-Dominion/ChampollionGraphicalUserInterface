@@ -15,6 +15,24 @@ public sealed class LocalPathValidator
     private static readonly string[] ProtectedEnvironmentPaths =
         ["WINDIR", "ProgramFiles", "ProgramFiles(x86)", "ProgramData"];
 
+    /// <summary>Protected output roots explicitly owned and made writable by the application.</summary>
+    private readonly string[] allowedProtectedOutputRoots;
+
+    #endregion
+
+    #region Constructors
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LocalPathValidator"/> class.
+    /// </summary>
+    /// <param name="allowedProtectedOutputRoots">Application-owned roots that may receive output in a protected location.</param>
+    public LocalPathValidator(IEnumerable<string>? allowedProtectedOutputRoots = null)
+    {
+        this.allowedProtectedOutputRoots = allowedProtectedOutputRoots?
+            .Select(Path.GetFullPath)
+            .ToArray() ?? [];
+    }
+
     #endregion
 
     #region Methods
@@ -82,7 +100,7 @@ public sealed class LocalPathValidator
         }
 
         string expandedPath = localPath.ExpandedPath!;
-        if (IsProtected(expandedPath))
+        if (IsProtected(expandedPath) && !IsAllowedProtectedOutput(expandedPath))
         {
             return Invalid("Output cannot be created in a protected Windows location.");
         }
@@ -168,6 +186,22 @@ public sealed class LocalPathValidator
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Determines whether an output path is within an application-owned protected root.
+    /// </summary>
+    /// <param name="path">The expanded output path to evaluate.</param>
+    /// <returns><see langword="true"/> when the path is explicitly allowed; otherwise, <see langword="false"/>.</returns>
+    private bool IsAllowedProtectedOutput(string path)
+    {
+        string pathWithSeparator = Path.TrimEndingDirectorySeparator(path) + Path.DirectorySeparatorChar;
+        return allowedProtectedOutputRoots.Any(root =>
+        {
+            string normalizedRoot = Path.TrimEndingDirectorySeparator(root);
+            return string.Equals(path, normalizedRoot, StringComparison.OrdinalIgnoreCase) ||
+                pathWithSeparator.StartsWith(normalizedRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
+        });
     }
 
     #endregion

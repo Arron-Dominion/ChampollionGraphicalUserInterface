@@ -14,7 +14,7 @@ The skill records the repository's current engineering conventions:
 - one public production type per source file;
 - mirrored source and test folder structures;
 - XML documentation requirements for production C#;
-- selective `Variables`, `Properties`, `Constructors`, and `Methods` regions;
+- mandatory applicable `Constants`, `Variables`, `Properties`, `Constructors`, and `Methods` regions for production classes and structs;
 - process, executable-search, settings, packaging, and platform guardrails;
 - focused validation followed by full solution tests.
 
@@ -95,21 +95,23 @@ The convention applies to hand-written production C# under `src`, not generated 
 - Every type and member receives a factual XML `<summary>` or appropriate `<inheritdoc/>`.
 - Every parameter receives a matching `<param>` element.
 - Every non-void method receives a `<returns>` element.
+- Private helpers and expression-bodied methods receive the same complete summary, parameter, and return documentation as public methods.
 - Properties use `<value>` when it clarifies nullability, meaning, or boolean behavior.
 - Positional records document constructor properties with type-level `<param>` elements.
 - Enum types and every enum value are documented.
 - Attributes remain adjacent to declarations.
 
-Regions are used only when they improve navigation, in this order:
+Every hand-written production class or struct uses each applicable region, in this order:
 
 ```text
+Constants
 Variables
 Properties
 Constructors
 Methods
 ```
 
-Tiny positional records, enums, empty types, and primary-constructor-only types may omit inapplicable regions.
+Compile-time `const` members belong in `Constants`; static-readonly and instance fields belong in `Variables`. Empty regions are not added. Positional records, enums, empty types, interfaces without grouped implementations, and primary-constructor-only types may omit inapplicable regions, but a file being short or newly created is not an exception.
 
 ## Maintaining the Skill
 
@@ -152,6 +154,8 @@ After changing the skill, verify:
 - [ ] Automatic and manual invocation settings match the intended behavior.
 - [ ] Architecture paths, namespaces, project references, and commands match the repository.
 - [ ] Documentation and region guidance matches representative production files.
+- [ ] Constants use `Constants` regions and are not grouped into `Variables`.
+- [ ] Private production methods include summaries, matching parameter elements, and return elements when non-void.
 - [ ] Test guidance matches the current test projects and mirrored layout.
 - [ ] The skill remains under 500 lines.
 - [ ] Markdown diagnostics are clear.

@@ -145,7 +145,7 @@
                             <StackPanel Spacing="6">
                                 <TextBlock Text="Papyrus source output (optional)" FontWeight="SemiBold" />
                                 <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
-                                      <TextBox Text="{Binding SourceOutputPath}" PlaceholderText="Default: beside the input" />
+                                      <TextBox Text="{Binding SourceOutputPath}" PlaceholderText="Papyrus source output folder" />
                                     <Button Grid.Column="1" Classes="compact" Content="Browse..." Click="BrowseSourceOutput_Click" />
                                     <Button Grid.Column="2" Classes="compact" Content="Open folder" Click="OpenSourceOutput_Click"
                                             ToolTip.Tip="Open the effective Papyrus source output folder in File Explorer." />
@@ -155,7 +155,7 @@
                             <StackPanel Spacing="6" IsEnabled="{Binding GenerateAssembly}">
                                 <TextBlock Text="Assembly output (optional)" FontWeight="SemiBold" />
                                 <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
-                                      <TextBox Text="{Binding AssemblyOutputPath}" PlaceholderText="Default: beside the input" />
+                                      <TextBox Text="{Binding AssemblyOutputPath}" PlaceholderText="Assembly output folder" />
                                     <Button Grid.Column="1" Classes="compact" Content="Browse..." Click="BrowseAssemblyOutput_Click" />
                                     <Button Grid.Column="2" Classes="compact" Content="Open folder" Click="OpenAssemblyOutput_Click"
                                             ToolTip.Tip="Open the effective assembly output folder in File Explorer." />
@@ -215,7 +215,7 @@
                             <TextBlock Text="Decompile, Print Information, and Print Compile Time require an existing .pex file or input directory. Help and Version run without input. Output and parameter controls apply to Decompile; the other operations report their results in Live Output. Paths may contain environment variables, but must resolve to absolute locations on a local fixed drive; network, mapped, and removable drives are unsupported. Output folders cannot be placed under protected Windows locations and must have an existing parent. Missing eligible output folders are created only after you approve the run confirmation." TextWrapping="Wrap" />
 
                             <TextBlock Classes="section" Text="Finding generated scripts" Margin="0,12,0,0" />
-                            <TextBlock Text="After a run, select Open folder beside Papyrus source output to find generated source scripts. When assembly generation is enabled, select Open folder beside Assembly output to find those files. If an output field is blank, its button opens Champollion's default folder beside the selected input file or the selected input directory. The status area reports when the folder does not exist yet." TextWrapping="Wrap" />
+                            <TextBlock Text="After a run, select Open folder beside Papyrus source output to find generated source scripts. When assembly generation is enabled, select Open folder beside Assembly output to find those files. At startup, these paths default to ChampollionGraphicalUserInterfaceOutput and ChampollionGraphicalUserInterfaceAssembly beside this application. The status area reports when a folder does not exist yet." TextWrapping="Wrap" />
 
                             <TextBlock Classes="section" Text="Executable search" Margin="0,12,0,0" />
                             <TextBlock Text="Automatic search checks local fixed drives, including Program Files and Program Files (x86), and returns only the selected edition. Search progress appears beside Run. Legacy is identified by its complete Decompiler.dll, Pex.dll, vcredist_x64.exe, and doc/Readme.html companion layout; Current is the standalone distribution. Ambiguous partial Legacy layouts are rejected. Search skips network and removable drives plus protected system and known unrelated application folders. You can cancel at any time; a cancelled or unsuccessful search restores the prior configured path." TextWrapping="Wrap" />
@@ -227,7 +227,7 @@
                             <TextBlock Text="Run progress and each input's standard output and errors appear live in the Workspace. Directory runs continue with the remaining files after one input fails, then show an OK or FAILED summary with exit codes. Copy places the complete displayed output on the clipboard. Open log appears after a failure or noteworthy standard-error output and selects the timestamped diagnostic log in File Explorer." TextWrapping="Wrap" />
 
                             <TextBlock Classes="section" Text="Saved configuration" Margin="0,12,0,0" />
-                            <TextBlock Text="Settings are stored in the UserData folder beside this running application. Existing settings and logs from the former LocalAppData location are migrated automatically. Executable paths and last-selected games are remembered separately for Legacy and Current, while parameters are restored for each edition and game profile. Changing edition or game clears input and output paths so they cannot carry into the next run. Input and output paths are never saved." TextWrapping="Wrap" />
+                            <TextBlock Text="Settings are stored in the UserData folder beside this running application. Existing settings and logs from the former LocalAppData location are migrated automatically. Executable paths and last-selected games are remembered separately for Legacy and Current, while parameters are restored for each edition and game profile. Changing edition or game clears the input path and restores the application output defaults. Input and output paths are never saved. If settings.json is malformed, it is preserved as a timestamped settings.corrupt file and the application starts with default settings." TextWrapping="Wrap" />
                             <TextBlock Text="{Binding SettingsLocation}" FontFamily="Cascadia Mono, Consolas" TextWrapping="Wrap" />
                             <Button Content="Open settings folder" Command="{Binding OpenSettingsFolderCommand}" HorizontalAlignment="Left" />
 

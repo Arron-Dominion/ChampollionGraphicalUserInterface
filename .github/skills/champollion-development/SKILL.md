@@ -95,6 +95,7 @@ Apply this pattern to hand-written production C# files under `src`. Document eve
 - Add `/// <summary>` describing responsibility or behavior.
 - Add one matching `/// <param>` for every method, constructor, primary-constructor, and positional-record parameter.
 - Add `/// <returns>` to every non-void method, including methods returning `Task` or `Task<T>`.
+- Apply the complete summary, parameter, and return block to private helpers and expression-bodied methods as well as public APIs. Access level and method length do not exempt a production method from documentation.
 - Add `/// <value>` to properties when it clarifies the returned value, nullability, or boolean meaning.
 - Use `/// <inheritdoc/>` for overrides when inherited documentation is accurate; add parameter documentation where the local pattern does so.
 - Document enum types and every enum value.
@@ -106,21 +107,23 @@ Keep XML documentation aligned with the declaration and place it before declarat
 
 ## Region Pattern
 
-Use regions only when they improve navigation. Use these exact names and this order when applicable:
+Every hand-written production class or struct must use each applicable region, including short and newly created files. Use these exact names and this order:
 
 ```text
+#region Constants
 #region Variables
 #region Properties
 #region Constructors
 #region Methods
 ```
 
-- `Variables`: constants and fields, including `[ObservableProperty]` backing fields.
+- `Constants`: compile-time `const` members only.
+- `Variables`: static-readonly and instance fields, including `[ObservableProperty]` backing fields.
 - `Properties`: explicit, computed, and collection properties.
 - `Constructors`: explicit constructors.
 - `Methods`: public, internal, protected, and private methods, event handlers, command methods, and partial hooks.
 
-Do not add empty or artificial regions. Tiny positional records, enums, empty types, and primary-constructor-only types may omit inapplicable regions. Keep `[ObservableProperty]`, `[RelayCommand]`, `[GeneratedRegex]`, and similar attributes attached to their declarations when moving members.
+Do not add empty regions. Positional records, enums, empty types, interfaces without grouped implementations, and primary-constructor-only types may omit inapplicable regions. File length is not an exception: a static class containing only constants and methods still requires `Constants` and `Methods` regions. Keep `[ObservableProperty]`, `[RelayCommand]`, `[GeneratedRegex]`, and similar attributes attached to their declarations when moving members.
 
 ## Tests
 
@@ -169,7 +172,9 @@ Also verify:
 
 - No new editor diagnostics exist.
 - Regions are balanced and members are in the correct category.
+- Constants are grouped in `#region Constants` rather than `#region Variables`.
 - XML parameter names exactly match declarations.
+- Every private production method has a summary, all matching parameter elements, and a return element when non-void.
 - DTO files remain data-only.
 - Project references preserve the dependency direction.
 - Every changed/new production type has its mirrored test file.

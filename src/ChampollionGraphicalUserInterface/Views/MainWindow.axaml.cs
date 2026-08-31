@@ -162,7 +162,7 @@ public partial class MainWindow : Window
         OpenOutputDirectory(ViewModel.AssemblyOutputPath, "assembly");
 
     /// <summary>
-    /// Opens a configured or input-adjacent output directory in File Explorer.
+    /// Opens a configured output directory or Champollion's process working directory in File Explorer.
     /// </summary>
     /// <param name="configuredOutputPath">The optional output path configured by the user.</param>
     /// <param name="outputName">The output name used in status messages.</param>

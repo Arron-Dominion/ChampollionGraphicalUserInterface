@@ -78,9 +78,17 @@ public sealed class AppSettingsStore
             return new AppSettings();
         }
 
-        await using FileStream stream = File.OpenRead(settingsPath);
-        return await JsonSerializer.DeserializeAsync<AppSettings>(stream, cancellationToken: cancellationToken)
-            ?? new AppSettings();
+        try
+        {
+            await using FileStream stream = File.OpenRead(settingsPath);
+            return await JsonSerializer.DeserializeAsync<AppSettings>(stream, cancellationToken: cancellationToken)
+                ?? new AppSettings();
+        }
+        catch (JsonException)
+        {
+            PreserveInvalidSettings();
+            return new AppSettings();
+        }
     }
 
     /// <summary>
@@ -92,8 +100,41 @@ public sealed class AppSettingsStore
     public async Task SaveAsync(AppSettings settings, CancellationToken cancellationToken = default)
     {
         Directory.CreateDirectory(dataDirectory);
-        await using FileStream stream = File.Create(settingsPath);
-        await JsonSerializer.SerializeAsync(stream, settings, new JsonSerializerOptions { WriteIndented = true }, cancellationToken);
+        string temporaryPath = Path.Combine(dataDirectory, $"settings.{Guid.NewGuid():N}.tmp");
+        try
+        {
+            await using (FileStream stream = File.Create(temporaryPath))
+            {
+                await JsonSerializer.SerializeAsync(
+                    stream,
+                    settings,
+                    new JsonSerializerOptions { WriteIndented = true },
+                    cancellationToken);
+            }
+
+            File.Move(temporaryPath, settingsPath, overwrite: true);
+        }
+        finally
+        {
+            File.Delete(temporaryPath);
+        }
+    }
+
+    /// <summary>
+    /// Moves malformed settings aside for troubleshooting without blocking application startup.
+    /// </summary>
+    private void PreserveInvalidSettings()
+    {
+        string backupPath = Path.Combine(
+            dataDirectory,
+            $"settings.corrupt-{DateTimeOffset.UtcNow:yyyyMMddTHHmmssfffZ}-{Guid.NewGuid():N}.json");
+        try
+        {
+            File.Move(settingsPath, backupPath);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+        }
     }
 
     /// <summary>

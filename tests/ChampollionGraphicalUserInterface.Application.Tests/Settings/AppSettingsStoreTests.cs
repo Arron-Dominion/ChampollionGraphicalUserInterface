@@ -80,4 +80,48 @@ public sealed class AppSettingsStoreTests
             if (Directory.Exists(root)) Directory.Delete(root, recursive: true);
         }
     }
+
+    [Fact]
+    public async Task Load_preserves_malformed_settings_and_returns_defaults()
+    {
+        string applicationDirectory = Path.Combine(Path.GetTempPath(), $"ChampollionCorruptSettings-{Guid.NewGuid():N}");
+        AppSettingsStore store = new(applicationDirectory, Path.Combine(applicationDirectory, "NoLegacyData"));
+        Directory.CreateDirectory(store.SettingsDirectory);
+        await File.WriteAllTextAsync(store.SettingsPath, "{\"LegacyExecutablePath\":");
+
+        try
+        {
+            AppSettings settings = await store.LoadAsync();
+
+            Assert.Null(settings.LegacyExecutablePath);
+            Assert.False(File.Exists(store.SettingsPath));
+            string backupPath = Assert.Single(Directory.GetFiles(store.SettingsDirectory, "settings.corrupt-*.json"));
+            Assert.Equal("{\"LegacyExecutablePath\":", await File.ReadAllTextAsync(backupPath));
+        }
+        finally
+        {
+            if (Directory.Exists(applicationDirectory)) Directory.Delete(applicationDirectory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public async Task Save_replaces_settings_without_leaving_temporary_files()
+    {
+        string applicationDirectory = Path.Combine(Path.GetTempPath(), $"ChampollionAtomicSettings-{Guid.NewGuid():N}");
+        AppSettingsStore store = new(applicationDirectory, Path.Combine(applicationDirectory, "NoLegacyData"));
+
+        try
+        {
+            await store.SaveAsync(new AppSettings { LegacyExecutablePath = "first.exe" });
+            await store.SaveAsync(new AppSettings { LegacyExecutablePath = "second.exe" });
+
+            AppSettings settings = await store.LoadAsync();
+            Assert.Equal("second.exe", settings.LegacyExecutablePath);
+            Assert.Empty(Directory.GetFiles(store.SettingsDirectory, "*.tmp"));
+        }
+        finally
+        {
+            if (Directory.Exists(applicationDirectory)) Directory.Delete(applicationDirectory, recursive: true);
+        }
+    }
 }

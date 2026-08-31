@@ -71,7 +71,7 @@ These commands cover normal build, test, and run workflows. Before submitting pr
 
 Paths must resolve to local fixed drives. UNC paths, mapped network locations, removable drives, and protected output locations are rejected. Missing eligible output directories are shown in the confirmation and created only after approval.
 
-When an output path is blank, its **Open folder** button uses Champollion's default location beside the selected input file or the selected input directory. The status area reports when the resolved folder does not exist yet.
+At startup, the Papyrus source output path is populated with `<application directory>\ChampollionGraphicalUserInterfaceOutput`, and the assembly output path is populated with `<application directory>\ChampollionGraphicalUserInterfaceAssembly`. The **Open folder** buttons use the paths displayed in those fields. The status area reports when a resolved folder does not exist yet.
 
 The Help tab includes an embedded browser with selectors for the Legacy Skyrim page and Current Starfield page. The browser uses Microsoft Edge WebView2. WebView2 is included with Windows 11; Windows 10 systems without it must install the Microsoft Edge WebView2 Runtime before using the embedded download pages.
 
@@ -93,9 +93,11 @@ Configuration is stored in a clearly named folder beside the running executable:
 
 Diagnostic logs are stored in `<application directory>\UserData\Logs`. On first launch, settings and logs from the previous `%LOCALAPPDATA%\ChampollionGraphicalUserInterface` location are copied into `UserData` and removed from the old location after each successful copy.
 
-The Help tab displays the resolved settings path and provides an **Open settings folder** action. The JSON uses `LegacyExecutablePath` and `CurrentExecutablePath` for the two external executables. Parameter profiles are stored in `EditionGameOptions` under explicit keys such as `Legacy:Skyrim` and `Current:Skyrim`; this prevents the same game's Legacy and Current selections from sharing values. Input, Papyrus source output, and assembly output paths are never written to settings and are cleared whenever the edition or game changes.
+Settings are saved through a temporary file and atomically replaced to reduce partial-write corruption. If `settings.json` cannot be parsed, it is preserved in `UserData` as a timestamped `settings.corrupt-*.json` file and the application starts with default settings.
 
-The Windows installer creates the adjacent `UserData` folder with standard-user modify access while leaving the application binaries protected. This also preserves upgrade compatibility with existing installations. For portable use, extract the application to a user-writable directory and keep the application files and `UserData` folder together.
+The Help tab displays the resolved settings path and provides an **Open settings folder** action. The JSON uses `LegacyExecutablePath` and `CurrentExecutablePath` for the two external executables. Parameter profiles are stored in `EditionGameOptions` under explicit keys such as `Legacy:Skyrim` and `Current:Skyrim`; this prevents the same game's Legacy and Current selections from sharing values. Input, Papyrus source output, and assembly output paths are never written to settings. Changing the edition or game clears the input path and restores both application output defaults.
+
+The Windows installer creates the adjacent `UserData`, `ChampollionGraphicalUserInterfaceOutput`, and `ChampollionGraphicalUserInterfaceAssembly` folders with standard-user modify access while leaving the application binaries protected. This also preserves upgrade compatibility with existing installations. For portable use, extract the application to a user-writable directory and keep the application files and data folders together.
 
 ## Windows Release
 

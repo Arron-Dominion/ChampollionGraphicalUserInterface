@@ -4,6 +4,7 @@ using System.Text;
 using ChampollionGraphicalUserInterface.Application.DTO.Input;
 using ChampollionGraphicalUserInterface.Application.DTO.Output;
 using ChampollionGraphicalUserInterface.Application.Execution;
+using ChampollionGraphicalUserInterface.Application.Paths;
 using ChampollionGraphicalUserInterface.Application.Search;
 using ChampollionGraphicalUserInterface.Application.Settings;
 using ChampollionGraphicalUserInterface.Application.Validation;
@@ -28,6 +29,8 @@ public partial class MainViewModel : ViewModelBase
     private readonly ExecutableSearchService searchService;
     /// <summary>The store used to load and save application settings.</summary>
     private readonly AppSettingsStore settingsStore;
+    /// <summary>The directory containing this application.</summary>
+    private readonly string applicationDirectory;
     /// <summary>The settings currently loaded for the application.</summary>
     private AppSettings settings = new();
     /// <summary>The cancellation source for the active executable search.</summary>
@@ -145,13 +148,16 @@ public partial class MainViewModel : ViewModelBase
     /// <param name="runner">The service used to execute Champollion.</param>
     /// <param name="searchService">The service used to locate Champollion executables.</param>
     /// <param name="settingsStore">The store used to persist application settings.</param>
+    /// <param name="applicationDirectory">The directory containing this application.</param>
     public MainViewModel(LocalPathValidator pathValidator, ChampollionRunner runner,
-        ExecutableSearchService searchService, AppSettingsStore settingsStore)
+        ExecutableSearchService searchService, AppSettingsStore settingsStore, string? applicationDirectory = null)
     {
         this.pathValidator = pathValidator;
         this.runner = runner;
         this.searchService = searchService;
         this.settingsStore = settingsStore;
+        this.applicationDirectory = Path.GetFullPath(applicationDirectory ?? AppContext.BaseDirectory);
+        ResetTransientPaths();
         RefreshGames();
     }
 
@@ -292,13 +298,15 @@ public partial class MainViewModel : ViewModelBase
         Process.Start(new ProcessStartInfo("explorer.exe", $"\"{settingsStore.SettingsDirectory}\"") { UseShellExecute = true });
 
     /// <summary>
-    /// Resolves a configured output directory or Champollion's input-adjacent default.
+    /// Resolves a configured output directory or Champollion's process working directory.
     /// </summary>
     /// <param name="configuredOutputPath">The optional output directory configured by the user.</param>
     /// <returns>The expanded absolute output directory, or <see langword="null"/> when no directory can be resolved.</returns>
     public string? ResolveOutputDirectory(string configuredOutputPath)
     {
-        string candidate = string.IsNullOrWhiteSpace(configuredOutputPath) ? InputPath : configuredOutputPath;
+        string candidate = string.IsNullOrWhiteSpace(configuredOutputPath)
+            ? Path.GetDirectoryName(ExecutablePath) ?? string.Empty
+            : configuredOutputPath;
         if (string.IsNullOrWhiteSpace(candidate))
         {
             return null;
@@ -306,10 +314,7 @@ public partial class MainViewModel : ViewModelBase
 
         try
         {
-            string expandedPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(candidate.Trim().Trim('"')));
-            return string.IsNullOrWhiteSpace(configuredOutputPath) && !Directory.Exists(expandedPath)
-                ? Path.GetDirectoryName(expandedPath)
-                : expandedPath;
+            return Path.GetFullPath(Environment.ExpandEnvironmentVariables(candidate.Trim().Trim('"')));
         }
         catch (Exception exception) when (exception is ArgumentException or NotSupportedException or PathTooLongException)
         {
@@ -329,7 +334,7 @@ public partial class MainViewModel : ViewModelBase
         SaveExecutable(oldValue);
         RefreshGames(GetRememberedGame(newValue));
         ExecutablePath = GetSavedExecutable();
-        ClearTransientPaths();
+        ResetTransientPaths();
         ClearIncompatibleOptions();
         ApplySavedOptions();
         OnPropertyChanged(nameof(IsCurrentEdition));
@@ -355,7 +360,7 @@ public partial class MainViewModel : ViewModelBase
         }
 
         RememberGame(SelectedEdition, newValue.Value);
-        ClearTransientPaths();
+        ResetTransientPaths();
         ClearIncompatibleOptions();
         ApplySavedOptions();
         OnPropertyChanged(nameof(CanRecreateSubdirectories));
@@ -519,13 +524,13 @@ public partial class MainViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// Clears input and output paths that should not carry across edition or game changes.
+    /// Clears the input path and restores application-owned output defaults.
     /// </summary>
-    private void ClearTransientPaths()
+    private void ResetTransientPaths()
     {
         InputPath = string.Empty;
-        SourceOutputPath = string.Empty;
-        AssemblyOutputPath = string.Empty;
+        SourceOutputPath = ApplicationOutputPaths.GetSourceDirectory(applicationDirectory);
+        AssemblyOutputPath = ApplicationOutputPaths.GetAssemblyDirectory(applicationDirectory);
     }
 
     /// <summary>

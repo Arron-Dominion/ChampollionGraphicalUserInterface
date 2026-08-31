@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using ChampollionGraphicalUserInterface.Application.Execution;
+using ChampollionGraphicalUserInterface.Application.Paths;
 using ChampollionGraphicalUserInterface.Application.Search;
 using ChampollionGraphicalUserInterface.Application.Settings;
 using ChampollionGraphicalUserInterface.Application.Validation;
@@ -28,7 +29,7 @@ public partial class App : Avalonia.Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            LocalPathValidator pathValidator = new();
+            LocalPathValidator pathValidator = new(ApplicationOutputPaths.GetDirectories());
             MainViewModel viewModel = new(
                 pathValidator,
                 new ChampollionRunner(pathValidator, new DiagnosticLogWriter()),

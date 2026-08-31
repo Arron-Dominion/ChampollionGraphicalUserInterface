@@ -46,7 +46,9 @@ public sealed class DiagnosticLogWriter
         CancellationToken cancellationToken = default)
     {
         Directory.CreateDirectory(logDirectory);
-        string path = Path.Combine(logDirectory, $"Champollion-{DateTimeOffset.Now:yyyyMMdd-HHmmss}.log");
+        string path = Path.Combine(
+            logDirectory,
+            $"Champollion-{DateTimeOffset.Now:yyyyMMdd-HHmmssfff}-{Guid.NewGuid():N}.log");
         StringBuilder contents = new();
         contents.AppendLine($"Edition: {request.Edition}");
         contents.AppendLine($"Game: {request.Game}");
