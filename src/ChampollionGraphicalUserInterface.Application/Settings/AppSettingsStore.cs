@@ -89,6 +89,10 @@ public sealed class AppSettingsStore
             PreserveInvalidSettings();
             return new AppSettings();
         }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            return new AppSettings();
+        }
     }
 
     /// <summary>

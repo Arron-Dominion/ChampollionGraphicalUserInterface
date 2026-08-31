@@ -105,6 +105,30 @@ public sealed class AppSettingsStoreTests
     }
 
     [Fact]
+    public async Task Load_returns_defaults_when_settings_are_temporarily_unreadable()
+    {
+        string applicationDirectory = Path.Combine(Path.GetTempPath(), $"ChampollionLockedSettings-{Guid.NewGuid():N}");
+        AppSettingsStore store = new(applicationDirectory, Path.Combine(applicationDirectory, "NoLegacyData"));
+        Directory.CreateDirectory(store.SettingsDirectory);
+        await File.WriteAllTextAsync(store.SettingsPath, "{\"LegacyExecutablePath\":\"legacy.exe\"}");
+
+        try
+        {
+            await using FileStream lockStream = new(store.SettingsPath, FileMode.Open, FileAccess.Read, FileShare.None);
+
+            AppSettings settings = await store.LoadAsync();
+
+            Assert.Null(settings.LegacyExecutablePath);
+            Assert.True(File.Exists(store.SettingsPath));
+            Assert.Empty(Directory.GetFiles(store.SettingsDirectory, "settings.corrupt-*.json"));
+        }
+        finally
+        {
+            if (Directory.Exists(applicationDirectory)) Directory.Delete(applicationDirectory, recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task Save_replaces_settings_without_leaving_temporary_files()
     {
         string applicationDirectory = Path.Combine(Path.GetTempPath(), $"ChampollionAtomicSettings-{Guid.NewGuid():N}");

@@ -37,6 +37,15 @@ public sealed class LocalPathValidatorTests
     }
 
     [Fact]
+    public void Malformed_paths_are_rejected_without_throwing()
+    {
+        PathValidationResult result = validator.ValidateInput("C:\\invalid\0path.pex");
+
+        Assert.False(result.IsValid);
+        Assert.NotNull(result.Error);
+    }
+
+    [Fact]
     public void Application_owned_output_is_allowed_in_protected_location()
     {
         string protectedDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);

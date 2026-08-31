@@ -128,30 +128,38 @@ public sealed class LocalPathValidator
             return Invalid("A path is required.");
         }
 
-        string expandedPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(path.Trim().Trim('"')));
-        if (!Path.IsPathFullyQualified(expandedPath))
+        try
         {
-            return Invalid("Use an absolute path.");
-        }
+            string expandedPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(path.Trim().Trim('"')));
+            if (!Path.IsPathFullyQualified(expandedPath))
+            {
+                return Invalid("Use an absolute path.");
+            }
 
-        if (expandedPath.StartsWith("\\\\", StringComparison.Ordinal))
+            if (expandedPath.StartsWith("\\\\", StringComparison.Ordinal))
+            {
+                return Invalid("Network paths are not supported.");
+            }
+
+            string? root = Path.GetPathRoot(expandedPath);
+            if (string.IsNullOrWhiteSpace(root))
+            {
+                return Invalid("The path has no local drive.");
+            }
+
+            DriveInfo drive = new(root);
+            if (drive.DriveType != DriveType.Fixed)
+            {
+                return Invalid("Only local fixed drives are supported.");
+            }
+
+            return Valid(expandedPath);
+        }
+        catch (Exception exception) when (
+            exception is ArgumentException or IOException or NotSupportedException or UnauthorizedAccessException)
         {
-            return Invalid("Network paths are not supported.");
+            return Invalid("The path is invalid.");
         }
-
-        string? root = Path.GetPathRoot(expandedPath);
-        if (string.IsNullOrWhiteSpace(root))
-        {
-            return Invalid("The path has no local drive.");
-        }
-
-        DriveInfo drive = new(root);
-        if (drive.DriveType != DriveType.Fixed)
-        {
-            return Invalid("Only local fixed drives are supported.");
-        }
-
-        return Valid(expandedPath);
     }
 
     /// <summary>
