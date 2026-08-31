@@ -1,0 +1,96 @@
+## Visual Studio, .NET, Avalonia, test, and packaging outputs.
+## Based on the Bethesda Voice Line Character Counter repository policy.
+
+# User-specific IDE files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+.vs/
+
+# Build outputs
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+bld/
+
+# Generated publish and release packages
+artifacts/
+publish/
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+
+# Test, coverage, benchmark, and profiler outputs
+[Tt]est[Rr]esult*/
+test-results/
+BenchmarkDotNet.Artifacts/
+coverage*.json
+coverage*.xml
+coverage*.info
+*.coverage
+*.coveragexml
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# Local application settings and diagnostic logs
+**/UserData/
+[Ll]og/
+[Ll]ogs/
+*.log
+*.svclog
+
+# Generated .NET and Visual Studio files
+project.lock.json
+project.fragment.lock.json
+*.nuget.props
+*.nuget.targets
+Generated Files/
+*.pdb
+*.obj
+*.iobj
+*.ilk
+*.ipdb
+*.tmp
+*.tmp_proj
+*.rsp
+*.cache
+*.pidb
+*.opendb
+*.VC.db
+*.VC.VC.opendb
+
+# IDE extensions and local analysis
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+.axoCover/
+_NCrunch_*
+.*crunch*.local.xml
+nCrunchTemp_*
+
+# Local credentials and signing material
+*.pfx
+*.p12
+*.snk
+
+# Operating-system and editor temporary files
+Thumbs.db
+Desktop.ini
+.DS_Store
+~$*
+*~
