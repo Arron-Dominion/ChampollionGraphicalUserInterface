@@ -1,0 +1,297 @@
+<Window xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:vm="using:ChampollionGraphicalUserInterface.ViewModels"
+                xmlns:converters="using:ChampollionGraphicalUserInterface.Converters"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="820"
+                x:Class="ChampollionGraphicalUserInterface.Views.MainWindow"
+                x:DataType="vm:MainViewModel"
+                Width="1280" Height="820" MinWidth="980" MinHeight="680"
+                Background="#F4F6F3" Foreground="#172522" FontFamily="Segoe UI"
+                Title="Champollion Graphical User Interface">
+    <Window.Styles>
+        <Style Selector="TabControl">
+            <Setter Property="Foreground" Value="#172522" />
+        </Style>
+        <Style Selector="TabItem">
+            <Setter Property="Foreground" Value="#314641" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="Foreground" Value="#172522" />
+            <Setter Property="BorderBrush" Value="#91A09C" />
+            <Setter Property="SelectionBrush" Value="#BFD1C9" />
+        </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="Foreground" Value="#172522" />
+            <Setter Property="BorderBrush" Value="#91A09C" />
+        </Style>
+        <Style Selector="CheckBox">
+            <Setter Property="Foreground" Value="#172522" />
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="Background" Value="#E4EAE7" />
+            <Setter Property="Foreground" Value="#172522" />
+            <Setter Property="BorderBrush" Value="#91A09C" />
+        </Style>
+        <Style Selector="TextBlock.section">
+            <Setter Property="FontFamily" Value="Bahnschrift" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="#20302D" />
+        </Style>
+        <Style Selector="TextBlock.hint">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="#66716E" />
+        </Style>
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="#B84C32" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Padding" Value="22,10" />
+        </Style>
+        <Style Selector="Button.compact">
+            <Setter Property="Padding" Value="12,7" />
+            <Setter Property="MinWidth" Value="76" />
+        </Style>
+        <Style Selector="Button.outputAction">
+            <Setter Property="Background" Value="#F7F3EA" />
+            <Setter Property="Foreground" Value="#172522" />
+            <Setter Property="BorderBrush" Value="#F7F3EA" />
+            <Setter Property="Padding" Value="12,7" />
+            <Setter Property="MinWidth" Value="76" />
+        </Style>
+        <Style Selector="Button.outputAction:pointerover">
+            <Setter Property="Background" Value="#D96547" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#F08A6F" />
+        </Style>
+        <Style Selector="Button:disabled, TextBox:disabled, ComboBox:disabled, CheckBox:disabled">
+            <Setter Property="Opacity" Value="0.58" />
+        </Style>
+    </Window.Styles>
+
+    <Window.Resources>
+        <converters:EnumDisplayNameConverter x:Key="EnumDisplayName" />
+    </Window.Resources>
+
+    <Grid RowDefinitions="72,*">
+        <Border Grid.Row="0" Background="#20302D" Padding="28,0">
+            <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+                <StackPanel Spacing="2">
+                    <TextBlock Text="CHAMPOLLION GRAPHICAL USER INTERFACE" FontFamily="Bahnschrift" FontSize="25" FontWeight="Bold" Foreground="#F7F3EA" />
+                    <TextBlock Text="PEX to Papyrus workspace" FontSize="12" Foreground="#BFD1C9" />
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="External Champollion executable required" Foreground="#D8E1DD" VerticalAlignment="Center" />
+            </Grid>
+        </Border>
+
+        <TabControl Grid.Row="1" Margin="22">
+            <TabItem Header="Workspace">
+                <Grid ColumnDefinitions="1.05*,0.95*" ColumnSpacing="26" Margin="8,20,8,8">
+                    <ScrollViewer>
+                        <StackPanel Spacing="18" Margin="0,0,8,12">
+                            <TextBlock Classes="section" Text="Configuration" />
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Champollion edition" FontWeight="SemiBold" />
+                                    <ComboBox ItemsSource="{Binding Editions}" SelectedItem="{Binding SelectedEdition}"
+                                                        ToolTip.Tip="Legacy targets Skyrim releases. Current adds Fallout and Starfield support." />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="6">
+                                    <TextBlock Text="Game" FontWeight="SemiBold" />
+                                    <ComboBox ItemsSource="{Binding Games}" SelectedItem="{Binding SelectedGame}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate x:CompileBindings="False">
+                                                <TextBlock Text="{Binding Converter={StaticResource EnumDisplayName}}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </StackPanel>
+                            </Grid>
+                            <TextBlock Classes="hint" Text="{Binding EditionDescription}" />
+
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Champollion executable" FontWeight="SemiBold" />
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                      <TextBox Text="{Binding ExecutablePath, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="C:\Tools\Champollion\Champollion.exe" />
+                                    <Button Grid.Column="1" Classes="compact" Content="Browse..." Click="BrowseExecutable_Click" />
+                                </Grid>
+                                <WrapPanel>
+                                    <Button Classes="compact" Content="Use app folder" Click="UseApplicationDirectory_Click" Margin="0,0,8,0" />
+                                        <Button Classes="compact" Content="Auto search" Command="{Binding SearchCommand}" Margin="0,0,8,0"
+                                            ToolTip.Tip="Searches local fixed drives concurrently with bounded workers. Live activity appears beside Run." />
+                                    <Button Classes="compact" Content="Cancel search" Command="{Binding CancelSearchCommand}" IsVisible="{Binding IsSearching}" />
+                                </WrapPanel>
+                                <TextBlock Classes="hint" Text="{Binding ExecutableValidation}" TextWrapping="Wrap" />
+                            </StackPanel>
+
+                            <TextBlock Classes="section" Text="Operation" Margin="0,8,0,0" />
+                            <ComboBox ItemsSource="{Binding Operations}" SelectedItem="{Binding SelectedOperation}" />
+                            <StackPanel Spacing="6" IsVisible="{Binding RequiresInput}">
+                                <TextBlock Text="Input .pex file or directory" FontWeight="SemiBold" />
+                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                                      <TextBox Text="{Binding InputPath, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Paste a local path" />
+                                    <Button Grid.Column="1" Classes="compact" Content="File..." Click="BrowseInputFile_Click" />
+                                    <Button Grid.Column="2" Classes="compact" Content="Folder..." Click="BrowseInputFolder_Click" />
+                                </Grid>
+                                <TextBlock Classes="hint" Text="{Binding InputValidation}" TextWrapping="Wrap" />
+                            </StackPanel>
+
+                            <TextBlock Classes="section" Text="Outputs" />
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Papyrus source output (optional)" FontWeight="SemiBold" />
+                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                                      <TextBox Text="{Binding SourceOutputPath}" PlaceholderText="Papyrus source output folder" />
+                                    <Button Grid.Column="1" Classes="compact" Content="Browse..." Click="BrowseSourceOutput_Click" />
+                                    <Button Grid.Column="2" Classes="compact" Content="Open folder" Click="OpenSourceOutput_Click"
+                                            ToolTip.Tip="Open the effective Papyrus source output folder in File Explorer." />
+                                </Grid>
+                            </StackPanel>
+                            <CheckBox Content="Generate human-readable assembly" IsChecked="{Binding GenerateAssembly}" />
+                            <StackPanel Spacing="6" IsEnabled="{Binding GenerateAssembly}">
+                                <TextBlock Text="Assembly output (optional)" FontWeight="SemiBold" />
+                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                                      <TextBox Text="{Binding AssemblyOutputPath}" PlaceholderText="Assembly output folder" />
+                                    <Button Grid.Column="1" Classes="compact" Content="Browse..." Click="BrowseAssemblyOutput_Click" />
+                                    <Button Grid.Column="2" Classes="compact" Content="Open folder" Click="OpenAssemblyOutput_Click"
+                                            ToolTip.Tip="Open the effective assembly output folder in File Explorer." />
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="16">
+                        <TextBlock Classes="section" Text="Parameters" />
+                        <Border Grid.Row="1" BorderBrush="#B6C1BD" BorderThickness="1" Padding="16" Background="#FFFFFF">
+                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="11">
+                                <CheckBox Content="Comments in source" IsChecked="{Binding GenerateComments}" />
+                                <CheckBox Grid.Column="1" Content="Recursive directories" IsChecked="{Binding Recursive}" IsEnabled="{Binding IsCurrentEdition}" ToolTip.Tip="Current Champollion only." />
+                                <CheckBox Grid.Row="1" Content="Recreate subdirectories" IsChecked="{Binding RecreateSubdirectories}" IsEnabled="{Binding CanRecreateSubdirectories}" ToolTip.Tip="Fallout 4 with Current Champollion only." />
+                                <CheckBox Grid.Row="1" Grid.Column="1" Content="Write source header" IsChecked="{Binding WriteHeader}" IsEnabled="{Binding IsCurrentEdition}" ToolTip.Tip="Current Champollion only." />
+                                <CheckBox Grid.Row="2" Content="Trace decompilation" IsChecked="{Binding Trace}" IsEnabled="{Binding IsCurrentEdition}" />
+                                <CheckBox Grid.Row="2" Grid.Column="1" Content="Do not dump trees" IsChecked="{Binding NoDumpTree}" IsEnabled="{Binding Trace}" ToolTip.Tip="Requires trace." />
+                                <CheckBox Grid.Row="3" Content="Debug/compiler functions" IsChecked="{Binding DebugFunctions}" IsEnabled="{Binding IsCurrentEdition}" />
+                                <CheckBox Grid.Row="3" Grid.Column="1" Content="Hide debug line numbers" IsChecked="{Binding NoDebugLineNumbers}" IsEnabled="{Binding IsCurrentEdition}" />
+                                <CheckBox Grid.Row="4" Content="Verbose output" IsChecked="{Binding Verbose}" IsEnabled="{Binding IsCurrentEdition}" />
+                            </Grid>
+                        </Border>
+                        <StackPanel Grid.Row="2" Spacing="8">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="{Binding Status}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                                <Button Grid.Column="1" Classes="primary" Content="Run Champollion" Click="Run_Click" IsEnabled="{Binding CanRun}" />
+                            </Grid>
+                            <ProgressBar Minimum="0" Maximum="{Binding TotalFiles}" Value="{Binding CompletedFiles}" Height="8" />
+                        </StackPanel>
+                        <Border Grid.Row="3" BorderBrush="#C8C8BD" BorderThickness="1" Background="#18211F" Padding="14">
+                            <Grid RowDefinitions="Auto,*">
+                                <Grid ColumnDefinitions="*,Auto,Auto">
+                                    <TextBlock Text="LIVE OUTPUT" Foreground="#BFD1C9" FontWeight="Bold" VerticalAlignment="Center" />
+                                    <Button Grid.Column="1" Classes="outputAction" Content="Copy" Click="CopyOutput_Click" Margin="0,0,8,0" />
+                                    <Button Grid.Column="2" Classes="compact" Content="Open log" Command="{Binding OpenLogFolderCommand}" IsVisible="{Binding HasLog}" />
+                                </Grid>
+                                <ScrollViewer x:Name="OutputScrollViewer" Grid.Row="1" Margin="0,10,0,0"
+                                              Background="#18211F" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                    <TextBlock Text="{Binding OutputText}" FontFamily="Cascadia Mono, Consolas"
+                                               Foreground="#E7EEE9" TextWrapping="NoWrap" />
+                                </ScrollViewer>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Help">
+                <Grid ColumnDefinitions="0.42*,0.58*" ColumnSpacing="22" Margin="20">
+                    <ScrollViewer>
+                        <StackPanel Spacing="14" Margin="8,6,8,20">
+                            <TextBlock Classes="section" Text="Using Champollion" />
+                            <TextBlock Text="1. Choose Legacy or Current Champollion and select the target game.&#10;2. Browse to Champollion.exe, use the copy in the application folder, or start automatic search. This GUI does not include either third-party executable.&#10;3. Choose Decompile, Print Information, Print Compile Time, Help, or Version.&#10;4. Select the required .pex file or directory and any compatible output options.&#10;5. Review the confirmation, including output folders that will be created, then run.&#10;6. Open generated scripts from the Output controls and review the live process output." TextWrapping="Wrap" LineHeight="24" />
+
+                            <TextBlock Classes="section" Text="Operations and paths" Margin="0,12,0,0" />
+                            <TextBlock Text="Decompile, Print Information, and Print Compile Time require an existing .pex file or input directory. Help and Version run without input. Output and parameter controls apply to Decompile; the other operations report their results in Live Output. Paths may contain environment variables, but must resolve to absolute locations on a local fixed drive; network, mapped, and removable drives are unsupported. Output folders cannot be placed under protected Windows locations and must have an existing parent. Missing eligible output folders are created only after you approve the run confirmation." TextWrapping="Wrap" />
+
+                            <TextBlock Classes="section" Text="Finding generated scripts" Margin="0,12,0,0" />
+                            <TextBlock Text="After a run, select Open folder beside Papyrus source output to find generated source scripts. When assembly generation is enabled, select Open folder beside Assembly output to find those files. At startup, these paths default to ChampollionGraphicalUserInterfaceOutput and ChampollionGraphicalUserInterfaceAssembly beside this application. The status area reports when a folder does not exist yet." TextWrapping="Wrap" />
+
+                            <TextBlock Classes="section" Text="Executable search" Margin="0,12,0,0" />
+                            <TextBlock Text="Automatic search checks local fixed drives, including Program Files and Program Files (x86), and returns only the selected edition. Search progress appears beside Run. Legacy is identified by its complete Decompiler.dll, Pex.dll, vcredist_x64.exe, and doc/Readme.html companion layout; Current is the standalone distribution. Ambiguous partial Legacy layouts are rejected. Search skips network and removable drives plus protected system and known unrelated application folders. You can cancel at any time; a cancelled or unsuccessful search restores the prior configured path." TextWrapping="Wrap" />
+
+                            <TextBlock Classes="section" Text="Parameter notes" Margin="0,12,0,0" />
+                            <TextBlock Text="A directory input processes .pex files in its top level. Current Champollion's Recursive directories option also processes subdirectories. The remaining modern parameters require Current Champollion. Recreate subdirectories is available only for Fallout 4 with Current Champollion. Do not dump trees requires Trace. Threaded mode is intentionally unavailable until both command-line editions have verified monitoring and failure behavior." TextWrapping="Wrap" />
+
+                            <TextBlock Classes="section" Text="Live output and diagnostics" Margin="0,12,0,0" />
+                            <TextBlock Text="Run progress and each input's standard output and errors appear live in the Workspace. Directory runs continue with the remaining files after one input fails, then show an OK or FAILED summary with exit codes. Copy places the complete displayed output on the clipboard. Open log appears after a failure or noteworthy standard-error output and selects the timestamped diagnostic log in File Explorer." TextWrapping="Wrap" />
+
+                            <TextBlock Classes="section" Text="Saved configuration" Margin="0,12,0,0" />
+                            <TextBlock Text="Settings are stored in the UserData folder beside this running application. Existing settings and logs from the former LocalAppData location are migrated automatically. Executable paths and last-selected games are remembered separately for Legacy and Current, while parameters are restored for each edition and game profile. Changing edition or game clears the input path and restores the application output defaults. Input and output paths are never saved. If settings.json is malformed, it is preserved as a timestamped settings.corrupt file and the application starts with default settings." TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding SettingsLocation}" FontFamily="Cascadia Mono, Consolas" TextWrapping="Wrap" />
+                            <Button Content="Open settings folder" Command="{Binding OpenSettingsFolderCommand}" HorizontalAlignment="Left" />
+
+                            <TextBlock Classes="section" Text="Download browser" Margin="0,12,0,0" />
+                            <TextBlock Text="Current opens first as the recommended Champollion edition. Use Legacy when you specifically need the older executable. Both buttons open their respective Nexus Mods pages in the embedded browser. Use Back, Forward, and Refresh to navigate. The browser requires Microsoft Edge WebView2; Windows 10 systems without the runtime must install it separately. Browser availability does not affect locally configured Champollion execution." TextWrapping="Wrap" />
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <Border Grid.Column="1" BorderBrush="#91A09C" BorderThickness="1" Background="#FFFFFF">
+                        <Grid RowDefinitions="Auto,*">
+                            <Border Background="#E4EAE7" Padding="12,10">
+                                <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto" ColumnSpacing="8">
+                                    <Button Classes="compact" Content="Current" Click="OpenCurrentDownload_Click" ToolTip.Tip="Open the recommended Current Champollion Nexus Mods page." />
+                                    <Button Grid.Column="1" Classes="compact" Content="Legacy" Click="OpenLegacyDownload_Click" ToolTip.Tip="Open the older Legacy Champollion Nexus Mods page." />
+                                    <Button Grid.Column="3" Classes="compact" Content="Back" Click="BrowserBack_Click" />
+                                    <Button Grid.Column="4" Classes="compact" Content="Forward" Click="BrowserForward_Click" />
+                                    <Button Grid.Column="5" Classes="compact" Content="Refresh" Click="BrowserRefresh_Click" />
+                                </Grid>
+                            </Border>
+                            <NativeWebView x:Name="DownloadBrowser" Grid.Row="1" Source="https://www.nexusmods.com/starfield/mods/4528" />
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="About">
+                <ScrollViewer>
+                    <Grid Margin="34,30" ColumnDefinitions="*,*" ColumnSpacing="42" MaxWidth="1180" HorizontalAlignment="Left">
+                        <StackPanel Spacing="14">
+                            <TextBlock Classes="section" Text="Champollion Graphical User Interface" />
+                            <TextBlock Text="A Windows interface for external Champollion PEX-to-Papyrus command-line tools." FontSize="16" TextWrapping="Wrap" />
+                            <TextBlock Text="The application validates the selected executable as a complete Legacy distribution or a standalone Current distribution. It does not replace or bundle either third-party Champollion tool." TextWrapping="Wrap" />
+                            <TextBlock Text="Version 2.0.0 · .NET 10 · Windows x64" Foreground="#66716E" />
+
+                            <TextBlock Classes="section" Text="Credits" Margin="0,18,0,0" />
+                            <TextBlock Text="Champollion Graphical User Interface&#10;Created and maintained by Arron-Dominion." TextWrapping="Wrap" />
+                            <TextBlock Text="Legacy Champollion: Champollion a PEX to Papyrus decompiler&#10;Created by li1nx, as credited on Nexus Mods." TextWrapping="Wrap" />
+                            <TextBlock Text="Current Champollion: Champollion&#10;Created by Nikitalita, as credited on Nexus Mods. File credits name Orvid King, Nikita Lita, and Paul-Henry Perrin." TextWrapping="Wrap" />
+                            <TextBlock Classes="hint" Text="The Champollion names and project credits identify external interoperable tools and do not imply affiliation or endorsement." TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Spacing="14">
+                            <TextBlock Classes="section" Text="Licenses and notices" />
+                            <TextBlock Text="This application is Copyright © 2026 Arron-Dominion and is distributed under the MIT License." TextWrapping="Wrap" />
+                            <WrapPanel>
+                                <Button Classes="compact" Content="Open application license" Click="OpenApplicationLicense_Click" Margin="0,0,8,0" />
+                                <Button Classes="compact" Content="Open third-party notices" Click="OpenThirdPartyNotices_Click" />
+                            </WrapPanel>
+
+                            <TextBlock Text="Avalonia UI 12.1.1 and Avalonia.Controls.WebView 12.1.0" FontWeight="SemiBold" Margin="0,10,0,0" />
+                            <TextBlock Text="Copyright AvaloniaUI OÜ / The AvaloniaUI Project. Distributed under the MIT License." TextWrapping="Wrap" />
+                            <TextBlock Text="CommunityToolkit.Mvvm 8.4.2 and Microsoft .NET 10" FontWeight="SemiBold" />
+                            <TextBlock Text="Copyright .NET Foundation and contributors. Distributed under the MIT License. The self-contained runtime also carries upstream third-party notices." TextWrapping="Wrap" />
+                            <TextBlock Text="Inter typeface" FontWeight="SemiBold" />
+                            <TextBlock Text="Copyright The Inter Project Authors. Distributed under the SIL Open Font License 1.1." TextWrapping="Wrap" />
+                            <TextBlock Text="Microsoft Edge WebView2 Runtime" FontWeight="SemiBold" />
+                            <TextBlock Text="A Windows prerequisite supplied by Microsoft and licensed separately under the terms accompanying the runtime. It is not bundled by this project." TextWrapping="Wrap" />
+                            <TextBlock Text="Inno Setup" FontWeight="SemiBold" />
+                            <TextBlock Text="Optional installer build tool under the Inno Setup License. Copyright Jordan Russell; portions copyright Martijn Laan. Inno Setup is not included in the application." TextWrapping="Wrap" />
+                            <TextBlock Classes="hint" Text="The external Current Champollion page states LGPLv3. Legacy permissions and both tools' complete terms remain on their respective Nexus Mods pages. Neither executable is distributed with this application." TextWrapping="Wrap" Margin="0,8,0,20" />
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

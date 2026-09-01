@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ChampollionGraphicalUserInterface.Application/ChampollionGraphicalUserInterface.Application.csproj" />
+    <Project Path="src/ChampollionGraphicalUserInterface.Domain/ChampollionGraphicalUserInterface.Domain.csproj" />
+    <Project Path="src/ChampollionGraphicalUserInterface/ChampollionGraphicalUserInterface.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ChampollionGraphicalUserInterface.Application.Tests/ChampollionGraphicalUserInterface.Application.Tests.csproj" />
+    <Project Path="tests/ChampollionGraphicalUserInterface.Domain.Tests/ChampollionGraphicalUserInterface.Domain.Tests.csproj" />
+    <Project Path="tests/ChampollionGraphicalUserInterface.Tests/ChampollionGraphicalUserInterface.Tests.csproj" />
+  </Folder>
+</Solution>
