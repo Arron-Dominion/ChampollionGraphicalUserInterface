@@ -6,6 +6,7 @@ This directory contains human-readable documentation for the repository's GitHub
 
 | Agent | Purpose | Documentation | Definition |
 | --- | --- | --- | --- |
+| `Champollion Architect` | Designs new features before implementation and produces private proposed diagrams, identified changes, rationale, and implementation slices under ignored `Feature/Design`. | [Usage and maintenance guide](champollion-architect.md) | [Agent definition](../../../.github/agents/champollion-architect.agent.md) |
 | `Champollion .NET Platform Evaluator` | Evaluates .NET upgrades, current Windows x64 readiness, proposed target feasibility, platform-specific dependencies, replacement boundaries, publishing, packaging, and CI. | [Usage and maintenance guide](champollion-dotnet-platform-evaluator.md) | [Agent definition](../../../.github/agents/champollion-dotnet-platform-evaluator.agent.md) |
 
 ## Documentation Policy

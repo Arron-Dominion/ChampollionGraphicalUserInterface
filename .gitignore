@@ -54,6 +54,9 @@ coverage*.info
 *.log
 *.svclog
 
+# Local feature architecture and design proposals
+/Feature/Design/
+
 # Generated .NET and Visual Studio files
 project.lock.json
 project.fragment.lock.json

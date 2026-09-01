@@ -6,6 +6,16 @@ namespace ChampollionGraphicalUserInterface.Application.Tests.Search;
 
 public sealed class ExecutableSearchServiceTests
 {
+    [Theory]
+    [InlineData(1, 4)]
+    [InlineData(8, 16)]
+    [InlineData(16, 32)]
+    [InlineData(64, 32)]
+    public void Worker_count_scales_for_io_bound_searches(int processorCount, int expectedWorkerCount)
+    {
+        Assert.Equal(expectedWorkerCount, ExecutableSearchService.CalculateWorkerCount(processorCount));
+    }
+
     [Fact]
     public async Task Search_traverses_independent_roots_concurrently()
     {
@@ -16,8 +26,8 @@ public sealed class ExecutableSearchServiceTests
             Directory.CreateDirectory(directory);
         }
 
-        int active = 0;
-        int maximumActive = 0;
+        using ManualResetEventSlim workersEntered = new();
+        int enteredWorkerCount = 0;
         try
         {
             ExecutableSearchService service = new(
@@ -26,10 +36,12 @@ public sealed class ExecutableSearchServiceTests
                 () => roots,
                 _ =>
                 {
-                    int current = Interlocked.Increment(ref active);
-                    InterlockedExtensions.Max(ref maximumActive, current);
-                    Thread.Sleep(75);
-                    Interlocked.Decrement(ref active);
+                    if (Interlocked.Increment(ref enteredWorkerCount) >= 2)
+                    {
+                        workersEntered.Set();
+                    }
+
+                    Assert.True(workersEntered.Wait(TimeSpan.FromSeconds(5)), "A second search worker did not start.");
                     return [];
                 },
                 workerCount: 4);
@@ -37,7 +49,7 @@ public sealed class ExecutableSearchServiceTests
             string? result = await service.FindAsync(ChampollionEdition.Current);
 
             Assert.Null(result);
-            Assert.True(maximumActive >= 2, $"Expected concurrent workers, observed {maximumActive}.");
+            Assert.True(enteredWorkerCount >= 2);
         }
         finally
         {
@@ -112,6 +124,34 @@ public sealed class ExecutableSearchServiceTests
         }
     }
 
+    [Fact]
+    public async Task Search_traverses_steam_directories()
+    {
+        string root = Path.Combine(Path.GetTempPath(), $"ChampollionSteamSearch-{Guid.NewGuid():N}");
+        string installDirectory = Path.Combine(root, "Steam", "steamapps", "common", "Skyrim", "NewExe");
+        Directory.CreateDirectory(installDirectory);
+        string executablePath = Path.Combine(installDirectory, "Champollion.exe");
+        File.WriteAllText(executablePath, string.Empty);
+
+        try
+        {
+            ExecutableSearchService service = new(
+                new LocalPathValidator(),
+                new ChampollionExecutableClassifier(),
+                () => [root],
+                Directory.EnumerateDirectories,
+                workerCount: 2);
+
+            string? result = await service.FindAsync(ChampollionEdition.Current);
+
+            Assert.Equal(executablePath, result);
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
     [Theory]
     [InlineData("Windows")]
     [InlineData("ProgramData")]
@@ -139,20 +179,4 @@ public sealed class ExecutableSearchServiceTests
         }
     }
 
-    private static class InterlockedExtensions
-    {
-        public static void Max(ref int location, int value)
-        {
-            int current;
-            do
-            {
-                current = Volatile.Read(ref location);
-                if (current >= value)
-                {
-                    return;
-                }
-            }
-            while (Interlocked.CompareExchange(ref location, value, current) != current);
-        }
-    }
 }

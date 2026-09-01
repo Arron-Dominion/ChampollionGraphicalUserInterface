@@ -37,6 +37,17 @@ Evaluate all applicable areas:
 
 Do not implement product migrations during an evaluation. Only inspect files, run non-destructive diagnostics, consult authoritative sources, and write the report. Never modify an existing report.
 
+## Repository Workflow Integration
+
+Repository source, project files, workflows, packaging, and authoritative external documentation remain the evidence for platform conclusions. Skills define follow-up engineering procedures; do not treat their repository baselines as substitutes for current implementation evidence.
+
+- Use `champollion-development` as the authority for implementing and validating recommended product, project, dependency, packaging, or release changes.
+- Use `champollion-diagrams` to identify architecture views that an implementation would need to assess or synchronize after changing frameworks, platforms, dependencies, runtime boundaries, external integrations, packaging, or deployment.
+- Use `champollion-readme` to identify root README claims that an implementation would need to assess or synchronize after changing supported targets, prerequisites, architecture, build commands, configuration, packaging, or release behavior.
+- Recommend a `champollion-code-review` pass after implementation when independent defect, architecture-diagram, and root README consistency review is warranted.
+
+Apply this knowledge to the report's findings, required work, and recommended implementation sequence. Do not invoke implementation or review workflows during the evaluation, and do not modify product code, tests, architecture diagrams, the root README, skill definitions, or agent guides. The evaluator's only repository write remains the new immutable report.
+
 ## Required Workflow
 
 1. Determine the requested .NET version and target matrix. If no .NET version is supplied, evaluate the latest stable supported release as of the run date. If no platform is supplied, assess the current Windows 10/11 x64 target only.
@@ -47,7 +58,7 @@ Do not implement product migrations during an evaluation. Only inspect files, ru
    ```
 
 3. Reserve `docs/reports/champollion-dotnet-platform-evaluation-<UTC_TIMESTAMP>.md`. Never overwrite a report; regenerate the timestamp on collision.
-4. Inspect the solution, projects, `global.json`, package references and restored assets, architecture boundaries, startup, views, path/search/execution/settings code, tests, publish profile, packaging, documentation, and CI.
+4. Inspect the solution, projects, `global.json`, package references and restored assets, architecture boundaries, startup, views, path/search/execution/settings code, tests, publish profile, packaging, documentation, CI, and applicable repository skill definitions.
 5. Record installed SDK and workload state with `dotnet --info`, `dotnet --list-sdks`, and `dotnet workload list` when available.
 6. Establish a focused build/test baseline. Report failures without repairing unrelated code.
 7. Evaluate compile, publish, package, and clean-target execution separately. A successful library build does not prove desktop runtime support.
@@ -142,7 +153,7 @@ Distinguish passed, failed, and not-run checks.
 
 ## Recommended Implementation Sequence
 
-Provide ordered, independently verifiable steps with a validation gate after each material change.
+Provide ordered, independently verifiable steps with a validation gate after each material change. Align implementation with `champollion-development`, include applicable architecture-diagram and root README impact assessments through their owning skills, and recommend `champollion-code-review` after implementation when warranted.
 
 ## Release And Packaging Impact
 
@@ -173,4 +184,5 @@ An evaluation is complete only when:
 - Domain, Application, UI, tests, packaging, and CI receive explicit decisions when present.
 - Executed, failed, and unexecuted validation are distinguishable.
 - Current support claims cite authoritative sources.
+- Recommended implementation steps identify applicable development, diagram, README, and review workflow gates without performing those workflows.
 - The final response links to the generated report.

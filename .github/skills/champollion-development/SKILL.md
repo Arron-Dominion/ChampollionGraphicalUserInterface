@@ -1,6 +1,6 @@
 ---
 name: champollion-development
-description: 'Implement, modify, refactor, or fix code in ChampollionGraphicalUserInterface. Use for changes to its .NET 10 clean architecture, Avalonia UI, Domain or Application layers, DTOs, execution, search, settings, validation, tests, XML documentation, regions, packaging, or release behavior.'
+description: 'Implement, modify, refactor, or fix code in ChampollionGraphicalUserInterface. Use for changes to its .NET 10 clean architecture, Avalonia UI, Domain or Application layers, DTOs, execution, search, settings, validation, tests, XML documentation, regions, architecture diagrams, root README, packaging, or release behavior.'
 argument-hint: 'Describe the Champollion GUI change to implement, refactor, or fix'
 user-invocable: true
 disable-model-invocation: false
@@ -12,13 +12,24 @@ Use this workflow for every implementation change in this repository. Preserve t
 
 Use `champollion-code-review` for defect-oriented reviews of pull requests, commits, branches, diffs, or changed files. This skill may inspect surrounding code while implementing a change, but it does not own the dedicated Copilot Review workflow.
 
+Use `champollion-diagrams` to assess and synchronize architecture diagrams after code, project, workflow, packaging, or release behavior changes. That skill owns diagram selection, source grounding, notation, focused/unified consistency, readability, and diagram validation.
+
+Use `champollion-readme` to assess and synchronize the root `README.md` after product, contributor, documentation, customization, configuration, packaging, or release claims change. That skill owns README scope, evidence mapping, organization, links, and validation.
+
+Use `Champollion Architect` before implementation when a new feature crosses ownership boundaries, introduces a material design choice, requires evaluation of patterns or best practices, or lacks an approved implementation shape. Its ignored `Feature/Design` package is a proposal and implementation handoff, not evidence that behavior already exists. Abort implementation when the package contains `DESIGN-STATUS: BLOCKED` or any blocking item in `outstanding-questions.md`.
+
 ## Establish Context
 
 1. Start from the named file, symbol, behavior, failing test, or nearest implementation surface.
-2. Read the owning source file and its mirrored test before editing.
-3. Check nearby implementations for the established local pattern.
-4. If the requested change alters an architectural boundary, verify the current project references and update this skill in the same change.
-5. Make the smallest change that resolves the behavior at its owning layer.
+2. For a materially ambiguous or cross-layer new feature without a current design, use `Champollion Architect` and resolve any blocking `Needs decision` items before implementation.
+3. When a `Feature/Design` package exists, read its scope, proposed changes, rationale, outstanding questions, and diagrams, then verify its current-state claims against source before relying on it.
+4. If `README.md` or `diagrams/proposed-design.md` contains `DESIGN-STATUS: BLOCKED`, or `outstanding-questions.md` contains a blocking item, stop without editing implementation files. Report the unresolved identifiers and request the decisions needed to resume.
+5. Read the owning source file and its mirrored test before editing.
+6. Check nearby implementations for the established local pattern.
+7. If the requested change alters an architectural boundary, verify the current project references and update this skill in the same change.
+8. Read `champollion-diagrams` when the change can affect a documented type, dependency, component, workflow, data flow, trust boundary, runtime container, or deployment path.
+9. Read `champollion-readme` when the change can affect a root-level product, contributor, documentation, customization, configuration, packaging, or release claim.
+10. Make the smallest change that resolves the behavior at its owning layer.
 
 ## Architecture Boundaries
 
@@ -144,6 +155,44 @@ Test behavior at its owning layer:
 
 Keep tests focused on the changed behavior. Preserve the one-production-file-to-one-test-file mirror even when related behavior is tested elsewhere.
 
+## Architecture Diagram Synchronization
+
+Assess diagram impact for every added, modified, renamed, moved, or removed production-code file and for changes to project files, GitHub Actions, packaging, or release behavior. Use `champollion-diagrams` for the assessment and any resulting edits; do not duplicate or override its diagram-family rules here.
+
+Perform this assessment after the first focused implementation validation succeeds and before final completion:
+
+1. Compare the changed behavior and ownership against `docs/architecture/diagrams`.
+2. Use the `champollion-diagrams` maintenance triggers to identify candidate views.
+3. Update only diagrams whose abstraction level exposes the changed fact.
+4. Check focused and unified counterparts for consistent names, boundaries, and principal flows.
+5. Update diagram indexes or visual notation when pages or relationship types change.
+6. Validate edited Mermaid, links, source claims, and normal-zoom preview readability as required by `champollion-diagrams`.
+
+Common impacts include:
+
+- new or changed production types: inspect the owning UML class diagram;
+- changed service wiring, responsibilities, dependencies, or project references: inspect component and package views;
+- changed calls, callbacks, guards, cancellation, or UI workflows: inspect sequence and communication views;
+- changed DTOs, settings, paths, process streams, generated output, or persistence: inspect data-flow views;
+- changed validation, external execution, WebView, desktop integration, or local data exposure: inspect security views;
+- changed runtime processes, external systems, supported platforms, CI, packaging, artifacts, or publication: inspect context, container, deployment, and supply-chain security views as applicable.
+
+Do not churn every candidate diagram mechanically. If no existing diagram exposes the changed fact, leave the suite unchanged and state in the completion report that diagram impact was assessed with no update required.
+
+## Root README Synchronization
+
+Assess root README impact for production, project, workflow, packaging, release, documentation-index, skill, agent, prerequisite, configuration, and license changes. Use `champollion-readme` for the assessment and resulting edits; do not duplicate its section-ownership or writing rules here.
+
+Perform this assessment after the first focused implementation validation succeeds and before final completion:
+
+1. Identify whether the change alters a stable root-level user or contributor claim.
+2. Compare the affected claim with its owning source, project, workflow, packaging, legal, customization, or detailed documentation evidence.
+3. Update only the root sections whose abstraction exposes the changed fact.
+4. Keep detailed implementation and maintenance guidance in its owning document and link to it from the README.
+5. Validate edited links, headings, commands, paths, claims, and Markdown diagnostics as required by `champollion-readme`.
+
+README and diagram impact are independent decisions. A change may require one, both, or neither. If internal-only work does not alter any current root-level claim, leave the README unchanged and state in the completion report that README impact was assessed with no update required.
+
 ## Repository Guardrails
 
 - Target .NET 10 and Windows x64 unless an explicit platform decision changes the project.
@@ -179,7 +228,9 @@ Also verify:
 - Project references preserve the dependency direction.
 - Every changed/new production type has its mirrored test file.
 - Packaging and documentation are updated when user-visible behavior, prerequisites, or versions change.
+- Architecture-diagram impact was assessed through `champollion-diagrams`; affected views and indexes were updated and validated, or the no-impact conclusion is reported.
+- Root README impact was assessed through `champollion-readme`; affected sections were updated and validated, or the no-impact conclusion is reported.
 
 ## Completion Report
 
-Summarize the behavior and ownership changes, list validation performed and actual test totals, and disclose any check that could not run. Do not claim release artifacts were regenerated unless packaging was executed.
+Summarize the behavior and ownership changes, list validation performed and actual test totals, and disclose any check that could not run. List architecture diagrams updated through `champollion-diagrams`, or state that diagram impact was assessed and no existing view required a change. List root README sections updated through `champollion-readme`, or state that README impact was assessed and no root-level claim required a change. Do not claim release artifacts were regenerated unless packaging was executed.

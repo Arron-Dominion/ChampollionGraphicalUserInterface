@@ -1,6 +1,6 @@
 ---
 name: champollion-code-review
-description: 'Review pull requests, commits, diffs, branches, and changed files in ChampollionGraphicalUserInterface. Use for GitHub Copilot code review of .NET 10, C#, Avalonia XAML, clean architecture, DTOs, tests, WebView2, process execution, executable search, settings, GitHub Actions, Windows Inno Setup packaging, release artifacts, versioning, and documentation.'
+description: 'Review pull requests, commits, diffs, branches, changed files, architecture-diagram consistency, and root README accuracy in ChampollionGraphicalUserInterface. Use for GitHub Copilot code review and source-to-documentation audits of .NET 10, C#, Avalonia XAML, clean architecture, DTOs, tests, WebView2, process execution, executable search, settings, Mermaid diagrams, README claims, GitHub Actions, Windows Inno Setup packaging, release artifacts, versioning, and documentation.'
 argument-hint: 'Review the current changes or a specified pull request, commit, diff, branch, or file.'
 user-invocable: true
 disable-model-invocation: false
@@ -12,9 +12,15 @@ Review changes for defects, regressions, architectural violations, accessibility
 
 Human maintainers should keep this skill synchronized with `docs/tools/skills/champollion-code-review-maintenance.md`.
 
+Use `champollion-diagrams` as the authority for diagram purpose, abstraction level, source grounding, notation, focused/unified consistency, maintenance triggers, and validation. This skill owns the audit and finding decision; `champollion-diagrams` defines what each architecture view is expected to represent.
+
+Use `champollion-readme` as the authority for root README scope, section ownership, evidence mapping, intentional summarization, maintenance triggers, links, and validation. This skill owns the audit and finding decision; `champollion-readme` defines what the repository entry point is expected to represent.
+
 ## Review Standard
 
 - Review the change, not the repository in the abstract. Establish the comparison base and inspect the complete relevant diff.
+- For an explicit architecture-diagram audit, treat the requested diagram family or repository architecture surface as the review target and report confirmed pre-existing mismatches. For an ordinary code review, report diagram drift only when the change introduces it, worsens it, or leaves a directly affected diagram stale.
+- For an explicit root README audit, treat the requested README sections or repository documentation surface as the review target and report confirmed pre-existing mismatches. For an ordinary code review, report README drift only when the change introduces it, worsens it, or leaves a directly affected root-level claim stale.
 - Prioritize correctness, behavior, accessibility, security, compatibility, packaging, and release integrity over style preferences.
 - Do not report pre-existing issues unless the change introduces them, materially worsens them, or makes them newly reachable.
 - Trace each candidate issue from the changed line to the code that computes, consumes, persists, packages, or presents the affected behavior.
@@ -43,10 +49,13 @@ Verify relevant facts against current files rather than treating this section as
 2. Read the complete relevant diff and enough surrounding code to identify ownership and behavior.
 3. Classify changes into Domain, Application, UI, tests, CI, Windows packaging, or documentation.
 4. Follow changed symbols to callers, bindings, DTO consumers, persistence, generated members, scripts, and release steps.
-5. Check the mirrored test file and behavioral branches introduced by the change.
-6. Run focused validation for each credible defect hypothesis.
-7. Re-read each exact changed location before reporting it.
-8. Report findings in descending severity. If no actionable defect remains, say so and name material validation limitations.
+5. Use `champollion-diagrams` maintenance triggers to identify architecture views that expose each changed or explicitly audited fact.
+6. Compare those diagrams with the owning code, project files, workflows, and packaging scripts; check focused and unified counterparts when both expose the fact.
+7. Use `champollion-readme` to identify root README sections that expose each changed or explicitly audited fact and compare their claims with owning evidence.
+8. Check the mirrored test file and behavioral branches introduced by the change.
+9. Run focused validation for each credible defect, diagram-mismatch, or README-mismatch hypothesis.
+10. Re-read each exact changed location and affected diagram or README location before reporting it.
+11. Report findings in descending severity. If no actionable defect, diagram mismatch, or README mismatch remains, say so and name material validation limitations.
 
 ## Validation Commands
 
@@ -167,9 +176,41 @@ Apply these checks to hand-written production C# under `src`, not generated file
 
 ## Documentation Checks
 
-- Require documentation updates when commands, prerequisites, supported targets, settings behavior, artifact names, install paths, versioning, or maintenance procedures change.
+- Require documentation updates when commands, prerequisites, supported targets, settings behavior, artifact names, install paths, versioning, maintenance procedures, or another documented contract changes.
 - Do not request documentation churn when a change restores already documented behavior.
 - Keep `.github` customization definitions synchronized with their human guides under `docs/tools`.
+
+Use `champollion-readme` for root README checks. During ordinary change review, inspect only directly affected root-level claims. During an explicit README audit, inspect the requested sections and report verified pre-existing discrepancies.
+
+A root README mismatch must cite both the owning code, project, workflow, packaging, legal, customization, or detailed documentation evidence and the affected README location. Do not report intentional root-level summarization, omitted implementation detail, or an internal-only change that does not alter a current user or contributor claim. Missing README maintenance is generally Low severity; use Medium only when false prerequisite, compatibility, configuration, packaging, security, or release guidance creates a concrete user or release risk.
+
+## Architecture Diagram Consistency Checks
+
+Use `champollion-diagrams` to select candidate views and interpret their intended scope. Architecture diagrams live under `docs/architecture/diagrams` and include context, container, component, package, deployment, sequence, data-flow, security, UML class, and communication views.
+
+For each changed or explicitly audited fact:
+
+1. Identify the owning source, project file, workflow, or packaging script.
+2. Select only diagram views whose documented abstraction level exposes that fact.
+3. Compare names, boundaries, ownership, dependencies, collaborators, messages, data, controls, risks, runtime nodes, and deployment steps as applicable.
+4. Check focused and unified counterparts for contradictory representations.
+5. Distinguish an intentional omission from stale, missing, unsupported, or contradictory architecture.
+6. Validate any changed Mermaid structure, local links, notation, and normal-zoom readability when diagrams are part of the review target.
+
+Treat these as mismatch candidates:
+
+- a production type is added, removed, renamed, moved, or retyped but a class diagram claiming project coverage remains stale;
+- project references, namespaces, package dependencies, service wiring, or ownership differ from package or component diagrams;
+- implemented calls, callbacks, guards, cancellation, or workflow outcomes contradict sequence or communication diagrams;
+- DTOs, settings, paths, process streams, generated files, or persistence differ from data-flow diagrams;
+- an implemented security control is missing or misrepresented, or an absent control is shown as implemented;
+- runtime processes, external systems, supported platforms, storage, WebView, or desktop boundaries contradict context or container diagrams;
+- CI runners, packaging steps, artifact names, checksums, release behavior, or distribution paths contradict deployment or supply-chain security diagrams;
+- focused and unified views use incompatible names, boundaries, dependencies, or principal flows for the same architecture.
+
+Do not report a mismatch merely because a diagram intentionally summarizes detail outside its scope. Examples include generated members omitted from class diagrams, failure alternatives omitted from a documented happy-path unified view, transitive packages omitted from the direct-dependency summary, or internal services omitted from System Context.
+
+A diagram mismatch finding must cite both sides of the contradiction: the source or configuration evidence and the affected diagram location. State the exact stale or false representation and the maintenance impact. Missing diagram updates are generally Low severity; use Medium only when misleading security, deployment, compatibility, or operational guidance creates a concrete user or release risk.
 
 ## Severity And Finding Format
 
@@ -185,6 +226,7 @@ For each finding provide:
 - an imperative title;
 - severity and confidence;
 - a precise changed-file location;
+- both owning evidence and affected documentation locations for architecture-diagram or root README mismatch findings;
 - trigger and observable impact;
 - evidence or focused failed validation;
 - a bounded remediation direction.

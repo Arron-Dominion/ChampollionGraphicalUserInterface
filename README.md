@@ -40,12 +40,37 @@ Application contracts sent from the UI are stored under `DTO/Input`; results and
 
 The solution targets .NET 10 and uses the `.slnx` format.
 
+## Documentation
+
+The [`docs`](docs) directory contains architecture references, durable engineering reports, and human-readable guides for the repository's GitHub Copilot customizations.
+
+| Area | Contents |
+| --- | --- |
+| [Architecture](docs/architecture/README.md) | Internal design documentation covering implementation algorithms and the complete architecture diagram suite. |
+| [Algorithms](docs/architecture/algorithms/README.md) | Detailed behavior such as concurrent local-drive discovery and conservative Legacy or Current executable classification. |
+| [Architecture diagrams](docs/architecture/diagrams/README.md) | Source-grounded Mermaid views of system scope, runtime boundaries, static structure, behavior, data, security, types, and delivery. |
+| [Evaluation reports](docs/reports/README.md) | Immutable timestamped engineering reports produced by repository custom agents, including .NET platform evaluations. |
+| [Copilot skills](docs/tools/skills/README.md) | Contributor guides for using and maintaining the development, code-review, architecture-diagram, and root README skills. |
+| [Copilot agents](docs/tools/agents/README.md) | Contributor guides for custom agents and their durable outputs, including the .NET Platform Evaluator. |
+
+The architecture diagram collection includes:
+
+- [System Context](docs/architecture/diagrams/system-context.md) and [Container](docs/architecture/diagrams/container-diagram.md) views for external relationships and runtime boundaries.
+- [Focused component](docs/architecture/diagrams/components/README.md), [unified component](docs/architecture/diagrams/unified-component-diagram.md), [detailed package](docs/architecture/diagrams/gui-package-diagram.md), [summary package](docs/architecture/diagrams/summary-gui-package-diagram.md), and [layered package](docs/architecture/diagrams/uml-gui-package-diagram.md) views for static responsibilities and compile-time dependencies.
+- [Sequence](docs/architecture/diagrams/sequences/README.md) and [Communication](docs/architecture/diagrams/communications/README.md) views for ordered interactions and numbered object collaborations.
+- [Data Flow](docs/architecture/diagrams/data-flows/README.md) and [Security](docs/architecture/diagrams/security/README.md) views for data movement, trust boundaries, implemented controls, and residual risks.
+- [UML Class](docs/architecture/diagrams/class-diagrams/README.md) views for per-project production types and source-visible relationships.
+- [Deployment](docs/architecture/diagrams/deployments/README.md) views for GitHub Actions packaging, GitHub Releases, and optional manual distribution to mod websites.
+
 ## Copilot Customizations
 
 The repository includes GitHub Copilot customizations for distinct engineering workflows:
 
 - [Champollion development skill](docs/tools/skills/champollion-development.md) for implementation, refactoring, and fixes.
-- [Champollion code review skill](docs/tools/skills/champollion-code-review-maintenance.md) for defect-oriented review of pull requests, commits, branches, diffs, and changed files.
+- [Champollion code review skill](docs/tools/skills/champollion-code-review-maintenance.md) for defect-oriented change review and source-grounded architecture-diagram and root README consistency audits.
+- [Champollion diagrams skill](docs/tools/skills/champollion-diagrams.md) for creating, maintaining, and auditing source-grounded architecture diagrams.
+- [Champollion README skill](docs/tools/skills/champollion-readme.md) for keeping the repository entry point concise and synchronized with product, contributor, documentation, customization, configuration, and release changes.
+- [Champollion Architect](docs/tools/agents/champollion-architect.md) for reviewing new-feature code paths, patterns, best practices, changes, rationale, and proposed diagrams in a private Git-ignored design workspace before implementation.
 - [Champollion .NET Platform Evaluator](docs/tools/agents/champollion-dotnet-platform-evaluator.md) for timestamped .NET, Windows x64, Avalonia/WebView2, proposed-platform, and release-readiness reports.
 
 ## Build and Test

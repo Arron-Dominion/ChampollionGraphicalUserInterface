@@ -88,6 +88,21 @@ For each run, the evaluator:
 
 The evaluator does not implement migrations or edit product code. Its expected repository write is the new report only.
 
+## Repository Skill Integration
+
+The evaluator understands the repository skills as follow-up workflow authorities:
+
+| Skill | Evaluator use |
+| --- | --- |
+| [`champollion-development`](../skills/champollion-development.md) | Structure recommended implementation and validation work. |
+| [`champollion-diagrams`](../skills/champollion-diagrams.md) | Identify architecture views that implementation must assess after platform, dependency, runtime, packaging, or deployment changes. |
+| [`champollion-readme`](../skills/champollion-readme.md) | Identify root README claims that implementation must assess after support, prerequisite, build, configuration, packaging, or release changes. |
+| [`champollion-code-review`](../skills/champollion-code-review-maintenance.md) | Recommend independent post-implementation defect and documentation consistency review when warranted. |
+
+Skills describe procedures, not platform facts. The evaluator must still verify conclusions against current source, project files, workflows, packaging, diagnostics, and authoritative external documentation.
+
+This integration affects report recommendations only. The evaluator does not invoke development or review workflows and must not modify product code, tests, diagrams, the root README, skills, or agent guides. Its only repository write remains the new immutable evaluation report.
+
 ## Reports
 
 ### Filename And Immutability
@@ -153,6 +168,7 @@ Update the agent and this guide when any of these change:
 - native dependencies and Windows-only API usage;
 - runtime identifiers, publish profiles, installer/archive formats;
 - CI target matrices and release artifacts;
+- development, diagram, root README, or review workflow responsibilities referenced by evaluation reports;
 - report filename, required sections, decisions, or severity definitions.
 
 When changing scope, update the frontmatter description, baseline, scope, workflow, evaluation rules, report template, completion criteria, and this guide together.
@@ -185,7 +201,8 @@ Do not remove `edit` while report creation remains mandatory. The body restricts
 9. Confirm UI/WebView and external Champollion receive explicit decisions.
 10. Confirm commands distinguish passed, failed, and not run.
 11. Confirm authoritative sources include titles, URLs, and access dates.
-12. Check `git status --short`; the report should be the only unexpected write.
+12. Confirm the recommended implementation sequence includes applicable development, diagram, README, and review gates without performing those workflows.
+13. Check `git status --short`; the report should be the only unexpected write.
 
 A useful validation request is:
 

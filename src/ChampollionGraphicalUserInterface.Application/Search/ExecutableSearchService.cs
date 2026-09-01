@@ -21,7 +21,12 @@ public sealed class ExecutableSearchService
     /// Directory names excluded from recursive executable searches.
     /// </summary>
     private static readonly string[] ExcludedDirectoryNames =
-        ["Windows", "ProgramData", "Microsoft", "Visual Studio", "Epic", "GOG", "Steam"];
+        ["Windows", "ProgramData", "Microsoft", "Visual Studio"];
+
+    /// <summary>
+    /// Maximum number of concurrent directory search workers.
+    /// </summary>
+    private const int MaximumWorkerCount = 32;
 
     /// <summary>
     /// The validator used to confirm executable candidates are valid local executable paths.
@@ -58,7 +63,7 @@ public sealed class ExecutableSearchService
     /// <param name="pathValidator">The validator used to validate executable candidates.</param>
     public ExecutableSearchService(LocalPathValidator pathValidator)
         : this(pathValidator, new ChampollionExecutableClassifier(), GetStartingDirectories, Directory.EnumerateDirectories,
-            Math.Clamp(Environment.ProcessorCount, 4, 16))
+            CalculateWorkerCount(Environment.ProcessorCount))
     {
     }
 
@@ -87,6 +92,14 @@ public sealed class ExecutableSearchService
     #endregion
 
     #region Methods
+
+    /// <summary>
+    /// Calculates a bounded worker count for the blocking filesystem search workload.
+    /// </summary>
+    /// <param name="processorCount">The number of logical processors available to the process.</param>
+    /// <returns>The number of directory search workers to create.</returns>
+    internal static int CalculateWorkerCount(int processorCount) =>
+        Math.Clamp(processorCount * 2, 4, MaximumWorkerCount);
 
     /// <summary>
     /// Searches local directories for a Champollion executable matching an edition.
@@ -131,13 +144,13 @@ public sealed class ExecutableSearchService
             return null;
         }
 
-        Task[] workers = Enumerable.Range(0, workerCount).Select(_ => Task.Run(async () =>
+        Task[] workers = Enumerable.Range(0, workerCount).Select(_ => Task.Factory.StartNew(() =>
         {
             try
             {
                 while (true)
                 {
-                    await available.WaitAsync(searchCancellation.Token);
+                    available.Wait(searchCancellation.Token);
                     if (!work.TryDequeue(out string? directory))
                     {
                         continue;
@@ -184,7 +197,7 @@ public sealed class ExecutableSearchService
             catch (OperationCanceledException)
             {
             }
-        }, CancellationToken.None)).ToArray();
+        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default)).ToArray();
 
         try
         {
