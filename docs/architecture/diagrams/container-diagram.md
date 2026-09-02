@@ -14,6 +14,7 @@ flowchart LR
         cli["CLI<br/>Selected Champollion.exe<br/>External native command-line process<br/><br/>Legacy or Current edition;<br/>decompiles PEX files and reports results"]
 
         storage[("Local Storage<br/>Windows local fixed-drive file system<br/><br/>PEX inputs; generated Papyrus and assembly;<br/>UserData/settings.json; diagnostic logs;<br/>installed Champollion distribution")]
+        webViewData[("Per-user Local AppData<br/>WebView2 profile")]
     end
 
     windows["Windows Desktop Services<br/>File and folder pickers, File Explorer,<br/>clipboard, fixed-drive discovery"]
@@ -27,6 +28,7 @@ flowchart LR
     cli -->|"Standard output, standard error,<br/>and exit code"| gui
 
     gui <-->|"Searches and validates paths;<br/>reads and writes settings;<br/>enumerates PEX inputs; writes logs"| storage
+    gui <-->|"Configures and uses browser profile"| webViewData
     cli <-->|"Reads PEX input and writes generated<br/>Papyrus source and optional assembly"| storage
 
     gui <-->|"Uses native desktop integration"| windows
@@ -45,6 +47,7 @@ flowchart LR
 ## Runtime Notes
 
 - The GUI, Application, and Domain projects compile into the GUI process; they are internal code boundaries rather than separately deployed containers.
+- The Help browser stores its WebView2 profile in the current user's Local AppData; the Windows installer removes that application-specific profile during uninstall.
 - A CLI process is created for each resolved input. Input-free Help and Version operations create one process without a PEX argument.
 - The GUI redirects and drains standard output and standard error, waits for process exit, and uses the exit code as the success signal.
 - Output directories are created by the GUI after validation and user confirmation. The CLI writes the requested generated files to those locations.

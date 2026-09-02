@@ -4,6 +4,7 @@ using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using ChampollionGraphicalUserInterface.ViewModels;
@@ -210,6 +211,22 @@ public partial class MainWindow : Window
     /// <param name="sender">The control that raised the click event.</param>
     /// <param name="e">The routed click event data.</param>
     private void OpenCurrentDownload_Click(object? sender, RoutedEventArgs e) => DownloadBrowser.Navigate(CurrentDownloadUri);
+
+    /// <summary>
+    /// Configures the Windows WebView2 profile in a user-writable directory.
+    /// </summary>
+    /// <param name="sender">The WebView that requested its environment.</param>
+    /// <param name="e">The environment configuration event data.</param>
+    private void DownloadBrowser_EnvironmentRequested(object? sender, WebViewEnvironmentRequestedEventArgs e)
+    {
+        if (e is WindowsWebView2EnvironmentRequestedEventArgs webView2)
+        {
+            webView2.UserDataFolder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "ChampollionGraphicalUserInterface",
+                "WebView2");
+        }
+    }
 
     /// <summary>
     /// Navigates the embedded browser back one page.

@@ -31,7 +31,7 @@ See the [security diagram notation table](README.md#notation) for additional det
 ## Diagram
 
 ```mermaid
-flowchart LR
+flowchart TB
     user["Local user"]:::external
 
     subgraph guiBoundary["GUI process trust boundary"]
@@ -58,9 +58,11 @@ flowchart LR
 
     legal[("Packaged LICENSE.txt and<br/>THIRD-PARTY-NOTICES.txt")]
     output[("In-memory process output")]
+    webViewData[("Per-user Local AppData<br/>WebView2 profile data")]
 
     user -->|"Edition page, Back, Forward,<br/>or Refresh"| help
     help --> fixedUris --> webView
+    help -->|"UserDataFolder configuration"| webViewData
     webView <-->|"HTTPS content"| nexus
     nexus <-->|"User-followed page links"| linkedSites
     help -->|"Browser history commands"| webView
@@ -93,6 +95,8 @@ flowchart LR
 ## Implemented Controls
 
 - The initial Help URI and the two edition buttons use fixed HTTPS Nexus Mods locations.
+- WebView2 user data is assigned to a per-user Local AppData directory instead of the installed application directory.
+- Windows uninstall removes the application-specific WebView2 profile, including its cookies and cached login state.
 - Legal-document actions combine the application directory with one of two fixed filenames and check existence before shell launch.
 - Output-folder actions require a resolved existing directory and pass it to `explorer.exe` as one structured argument.
 - Executable and PEX pickers expose extension filters, with authoritative path validation performed after selection.

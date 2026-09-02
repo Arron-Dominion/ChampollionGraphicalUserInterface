@@ -23,7 +23,7 @@ flowchart LR
     user["User"]
     execute(["3.0 Validate and Execute Request"])
     build(["3.1 Build Structured Arguments"])
-    present(["4.0 Present Progress and Results"])
+    output(["4.0 Present Output and Desktop Actions"])
     cli["Legacy or Current Champollion.exe"]
 
     settings[("D1 Application UserData<br/>settings.json")]
@@ -44,10 +44,8 @@ flowchart LR
     cli -->|"Generated source and optional assembly"| outputs
     cli -->|"stdout chunks, stderr chunks, and exit code"| execute
 
-    execute -->|"ExecutionOutput and ExecutionProgress"| present
     execute -->|"Request details and noteworthy results"| logs
-    execute -->|"ExecutionSummary and log path"| present
-    present -->|"Live output, progress, per-input status,<br/>success and failure counts, and errors"| user
+    execute -->|"ExecutionOutput, ExecutionProgress,<br/>ExecutionSummary, and log path"| output
 ```
 
 ## Data Contracts

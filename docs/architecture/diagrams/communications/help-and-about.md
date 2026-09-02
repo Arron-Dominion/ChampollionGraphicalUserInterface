@@ -26,41 +26,62 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    user(["User"])
-    window["window : MainWindow"]
-    webView["browser : NativeWebView"]
-    runtime["runtime : Edge WebView2 Runtime"]
-    nexus["site : Nexus Mods"]
-    applicationDirectory["files : Application Directory"]
-    shell["shell : Windows Associated Application"]
-    viewModel["viewModel : MainViewModel"]
-    documentDecision{"Packaged document exists?"}
+    subgraph browserWorkflow["1. Help browser collaboration"]
+        direction TB
+        browserUser(["user : User"])
+        browserWindow["window : MainWindow"]
+        browser["browser : NativeWebView"]
+        runtime["runtime : Edge WebView2 Runtime"]
+        profile["profile : WebView2<br/>Local AppData"]
+        nexus["site : Nexus Mods"]
 
-    user -->|"1a: select Current or Legacy page"| window
-    window -->|"1a.1: Navigate(fixed Nexus Mods URI)"| webView
-    webView -->|"1a.1.1: request navigation"| runtime
-    runtime -->|"1a.1.1.1: HTTPS request"| nexus
-    nexus -.->|"1a.1.1.2: download page"| runtime
-    runtime -.->|"1a.1.2: rendered page"| webView
-    webView -.->|"1a.2: embedded content"| user
+        browser -->|"1.0: EnvironmentRequested<br/>on attach"| browserWindow
+        browserWindow -->|"1.0.1: set UserDataFolder"| profile
+        browserUser -->|"1.1: select page"| browserWindow
+        browserWindow -->|"1.2: Navigate(fixed URI)"| browser
+        browser -->|"1.3: request navigation"| runtime
+        runtime -->|"1.4: HTTPS request"| nexus
+        nexus -.->|"1.5: page"| runtime
+        runtime -.->|"1.6: rendered content"| browser
+        browser -.->|"1.7: embedded content"| browserUser
+    end
 
-    user -->|"1b: select Back, Forward, or Refresh"| window
-    window -->|"1b.1: GoBack(), GoForward(),<br/>or Refresh()"| webView
-    webView -->|"1b.1.1: perform browser action"| runtime
-    runtime -.->|"1b.1.2: updated page"| webView
+    subgraph historyWorkflow["2. Browser history collaboration"]
+        direction TB
+        historyUser(["user : User"])
+        historyWindow["window : MainWindow"]
+        historyBrowser["browser : NativeWebView"]
+        historyRuntime["runtime : Edge WebView2 Runtime"]
 
-    user -->|"1c: open license or notices"| window
-    window -->|"1c.1: check fixed packaged filename"| applicationDirectory
-    applicationDirectory -.->|"1c.2: existence result"| window
-    window --> documentDecision
-    documentDecision -->|"1c.3a [yes]: start document<br/>with UseShellExecute"| shell
-    shell -.->|"1c.3a.1: display document"| user
-    documentDecision -->|"1c.3b [no]: set status"| viewModel
-    viewModel -.->|"1c.3b.1: display missing-file status"| user
+        historyUser -->|"2.1: select Back, Forward,<br/>or Refresh"| historyWindow
+        historyWindow -->|"2.2: browser history command"| historyBrowser
+        historyBrowser -->|"2.3: perform action"| historyRuntime
+        historyRuntime -.->|"2.4: updated page"| historyBrowser
+    end
+
+    subgraph legalWorkflow["3. About document collaboration"]
+        direction TB
+        legalUser(["user : User"])
+        legalWindow["window : MainWindow"]
+        applicationDirectory["files : Application Directory"]
+        documentDecision{"Document exists?"}
+        shell["shell : Windows Associated Application"]
+        viewModel["viewModel : MainViewModel"]
+
+        legalUser -->|"3.1: open license or notices"| legalWindow
+        legalWindow -->|"3.2: check fixed filename"| applicationDirectory
+        applicationDirectory -.->|"3.3: existence result"| legalWindow
+        legalWindow --> documentDecision
+        documentDecision -->|"3.4a [yes]: open document"| shell
+        shell -.->|"3.5a: display document"| legalUser
+        documentDecision -->|"3.4b [no]: set status"| viewModel
+        viewModel -.->|"3.5b: display status"| legalUser
+    end
 ```
 
 ## Collaboration Notes
 
 - Edition-page actions supply fixed HTTPS locations; browser history actions operate on the page currently held by `NativeWebView`.
 - WebView2 and Nexus Mods participate only in Help browsing and do not collaborate with local Champollion execution.
+- The browser profile is stored in per-user Local AppData and is removed by the Windows installer during uninstall.
 - Legal-document actions use fixed filenames beside the application, check existence, and delegate display to the Windows-associated application.
