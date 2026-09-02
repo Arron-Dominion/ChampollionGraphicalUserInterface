@@ -10,11 +10,16 @@ sequenceDiagram
     participant Window as MainWindow
     participant WebView as NativeWebView
     participant Runtime as Edge WebView2 Runtime
+    participant Profile as Per-user WebView2 profile
     participant Nexus as Nexus Mods
     participant FS as Application Directory
     participant Shell as Windows Associated Application
     participant VM as MainViewModel
 
+    opt WebView attaches
+        WebView->>Window: EnvironmentRequested
+        Window->>Profile: Set UserDataFolder under Local AppData
+    end
     alt User opens Current or Legacy download page
         User->>Window: Select Current or Legacy
         Window->>WebView: Navigate(fixed Nexus Mods URI)
@@ -45,4 +50,5 @@ sequenceDiagram
 
 - Current navigates to Starfield mod `4528`; Legacy navigates to Skyrim mod `35307`.
 - WebView2 availability affects only the embedded download browser, not locally configured CLI execution.
+- The WebView2 profile is stored under the current user's Local AppData directory; Windows uninstall removes that application-specific profile.
 - Legal documents are expected beside the running GUI executable because the project copies them to build and publish output.

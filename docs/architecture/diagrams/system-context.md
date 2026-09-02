@@ -12,6 +12,7 @@ flowchart LR
 
     subgraph localMachine["Windows 10/11 x64 machine"]
         fileSystem[("Local fixed-drive file system<br/>PEX inputs, generated Papyrus and assembly,<br/>UserData settings and logs")]
+        webViewData[("Per-user Local AppData<br/>WebView2 profile")]
         legacy["Legacy Champollion.exe<br/>External PEX decompiler<br/>with companion distribution"]
         current["Current Champollion.exe<br/>External PEX decompiler<br/>standalone distribution"]
         windowsServices["Windows desktop services<br/>File and folder pickers, File Explorer,<br/>clipboard, drive discovery"]
@@ -27,6 +28,7 @@ flowchart LR
     app -->|"Shows status, captured process output,<br/>progress, and confirmations"| user
 
     app <-->|"Validates and searches paths;<br/>reads PEX files; writes settings and logs"| fileSystem
+    app <-->|"Stores Help browser cookies and state"| webViewData
     legacy <-->|"Reads PEX input and writes requested output"| fileSystem
     current <-->|"Reads PEX input and writes requested output"| fileSystem
 
@@ -47,4 +49,5 @@ flowchart LR
 - Legacy and Current Champollion are separate external command-line tools. The application supplies structured arguments, captures both output streams, and treats the process exit code as the success signal.
 - The local file system holds selected `.pex` inputs, generated Papyrus source and optional assembly, application-adjacent `UserData/settings.json`, and diagnostic logs. Network, mapped, and removable drives are outside the supported path boundary.
 - The Help browser uses `Avalonia.Controls.WebView` backed by the Microsoft Edge WebView2 Runtime. It opens the Legacy page at `https://www.nexusmods.com/skyrim/mods/35307` and the Current page at `https://www.nexusmods.com/starfield/mods/4528`.
+- The Help browser stores its WebView2 profile under the current user's Local AppData. Windows uninstall removes this application-specific profile.
 - Windows desktop services provide file and folder selection, clipboard access, File Explorer navigation, fixed-drive discovery, and the WebView2 host. The currently supported product boundary is Windows 10/11 x64.

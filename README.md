@@ -52,6 +52,7 @@ The [`docs`](docs) directory contains architecture references, durable engineeri
 | [Evaluation reports](docs/reports/README.md) | Immutable timestamped engineering reports produced by repository custom agents, including .NET platform evaluations. |
 | [Copilot skills](docs/tools/skills/README.md) | Contributor guides for using and maintaining the development, code-review, architecture-diagram, and root README skills. |
 | [Copilot agents](docs/tools/agents/README.md) | Contributor guides for custom agents and their durable outputs, including the .NET Platform Evaluator. |
+| [Windows installer maintenance](docs/tools/package/windows-installer-maintenance.md) | Windows publishing, portable ZIPs, Inno Setup installers, artifacts, privileges, and maintenance procedures. |
 
 The architecture diagram collection includes:
 
@@ -99,6 +100,8 @@ Paths must resolve to local fixed drives. UNC paths, mapped network locations, r
 At startup, the Papyrus source output path is populated with `<application directory>\ChampollionGraphicalUserInterfaceOutput`, and the assembly output path is populated with `<application directory>\ChampollionGraphicalUserInterfaceAssembly`. The **Open folder** buttons use the paths displayed in those fields. The status area reports when a resolved folder does not exist yet.
 
 The Help tab includes an embedded browser with selectors for the Legacy Skyrim page and Current Starfield page. The browser uses Microsoft Edge WebView2. WebView2 is included with Windows 11; Windows 10 systems without it must install the Microsoft Edge WebView2 Runtime before using the embedded download pages.
+
+The embedded browser stores its cache, cookies, and login state in the current user's `%LOCALAPPDATA%\ChampollionGraphicalUserInterface\WebView2` profile, separate from the application's `UserData` settings and logs. The Windows installer removes this application-specific browser profile during uninstall.
 
 ## Credits and Licenses
 

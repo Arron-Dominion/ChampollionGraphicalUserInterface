@@ -5,7 +5,7 @@
 This diagram shows the Help tab's embedded download browser and the About tab's packaged legal-document actions. These features do not participate in local Champollion execution.
 
 ```mermaid
-flowchart LR
+flowchart TB
     user["User"]
 
     subgraph ui["GUI project"]
@@ -19,11 +19,13 @@ flowchart LR
     legacy["Nexus Mods<br/>Legacy Skyrim page 35307"]
     current["Nexus Mods<br/>Current Starfield page 4528"]
     storage[("Application directory<br/>LICENSE.txt and THIRD-PARTY-NOTICES.txt")]
+    profile[("Per-user Local AppData<br/>WebView2 profile")]
     shell["Windows associated application"]
 
     user -->|"Selects edition page, Back,<br/>Forward, or Refresh"| xaml
     xaml -->|"Raises event"| codeBehind
     codeBehind -->|"Navigate, GoBack, GoForward, or Refresh"| browser
+    codeBehind -->|"Configures user-writable profile"| profile
     browser -->|"Uses native host"| webView2
     webView2 <-->|"HTTPS content"| legacy
     webView2 <-->|"HTTPS content"| current
@@ -39,6 +41,7 @@ flowchart LR
 ## Key Relationships
 
 - `MainWindow.axaml` owns the `NativeWebView`; code-behind supplies the fixed Legacy and Current Nexus Mods URIs and navigation actions.
+- `MainWindow` assigns the WebView2 profile to the per-user Local AppData directory so the browser does not write into the installed application directory.
 - `Avalonia.Controls.WebView` uses the separately supplied WebView2 Runtime on Windows.
 - The About actions resolve legal documents beside the running application and ask Windows to open them with the associated application.
 - Browser availability and legal-document actions are independent of the local `Champollion.exe` execution workflow.

@@ -247,7 +247,8 @@
                                     <Button Grid.Column="5" Classes="compact" Content="Refresh" Click="BrowserRefresh_Click" />
                                 </Grid>
                             </Border>
-                            <NativeWebView x:Name="DownloadBrowser" Grid.Row="1" Source="https://www.nexusmods.com/starfield/mods/4528" />
+                            <NativeWebView x:Name="DownloadBrowser" Grid.Row="1" Source="https://www.nexusmods.com/starfield/mods/4528"
+                                           EnvironmentRequested="DownloadBrowser_EnvironmentRequested" />
                         </Grid>
                     </Border>
                 </Grid>

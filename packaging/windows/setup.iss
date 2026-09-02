@@ -33,6 +33,9 @@ Name: "{app}\UserData"; Permissions: users-modify
 Name: "{app}\ChampollionGraphicalUserInterfaceOutput"; Permissions: users-modify
 Name: "{app}\ChampollionGraphicalUserInterfaceAssembly"; Permissions: users-modify
 
+[UninstallDelete]
+Type: filesandordirs; Name: "{localappdata}\ChampollionGraphicalUserInterface\WebView2"
+
 [Files]
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
