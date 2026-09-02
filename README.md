@@ -101,7 +101,7 @@ At startup, the Papyrus source output path is populated with `<application direc
 
 The Help tab includes an embedded browser with selectors for the Legacy Skyrim page and Current Starfield page. The browser uses Microsoft Edge WebView2. WebView2 is included with Windows 11; Windows 10 systems without it must install the Microsoft Edge WebView2 Runtime before using the embedded download pages.
 
-The embedded browser stores its cache, cookies, and login state in the current user's `%LOCALAPPDATA%\ChampollionGraphicalUserInterface\WebView2` profile, separate from the application's `UserData` settings and logs. The Windows installer removes this application-specific browser profile during uninstall.
+The embedded browser stores its cache, cookies, and login state in the current user's `%LOCALAPPDATA%\ChampollionGraphicalUserInterface\WebView2` profile, separate from the application's `UserData` settings and logs. The Windows installer attempts to remove this application-specific browser profile for the user account running the uninstall.
 
 ## Credits and Licenses
 
